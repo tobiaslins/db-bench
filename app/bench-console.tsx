@@ -23,7 +23,7 @@ type CompareResult = {
 };
 
 const providers: BenchProvider[] = ["jazz", "postgres", "turso"];
-const operations: BenchOperation[] = ["suite", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
+const operations: BenchOperation[] = ["suite", "createOne", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
 const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "edge", "local"];
 const jazzLocalUpdatesOptions: JazzLocalUpdates[] = ["deferred", "immediate"];
 
@@ -39,6 +39,11 @@ function findFirstId(response: BenchResponse): string | null {
   const direct = result.result;
   if (isRecord(direct) && typeof direct.firstId === "string") {
     return direct.firstId;
+  }
+
+  const create1k = result.create1k;
+  if (isRecord(create1k) && isRecord(create1k.result) && typeof create1k.result.firstId === "string") {
+    return create1k.result.firstId;
   }
 
   const create = result.create;
@@ -57,6 +62,11 @@ function findRunId(response: BenchResponse): string | null {
   const direct = result.result;
   if (isRecord(direct) && typeof direct.runId === "string") {
     return direct.runId;
+  }
+
+  const create1k = result.create1k;
+  if (isRecord(create1k) && isRecord(create1k.result) && typeof create1k.result.runId === "string") {
+    return create1k.result.runId;
   }
 
   const create = result.create;
@@ -96,7 +106,7 @@ function suiteTiming(response: BenchResponse, key: string): number | null {
 }
 
 function buildCompareRows(responses: Record<BenchProvider, BenchResponse>): CompareRow[] {
-  return ["create", "select10", "selectTopN", "getById", "updateById", "updateTopN"].map((operation) => {
+  return ["createOne", "create1k", "select10", "selectTopN", "getById", "updateById", "updateTopN"].map((operation) => {
     const timings = Object.fromEntries(providers.map((item) => [item, suiteTiming(responses[item], operation)])) as Record<
       BenchProvider,
       number | null
@@ -170,7 +180,7 @@ export function BenchConsole() {
   async function runProviderSuite(nextProvider: BenchProvider, nextRunId: string) {
     const body = {
       operation: "suite",
-      count,
+      count: 1000,
       n,
       runId: nextRunId,
       jazzDurabilityTier: nextProvider === "jazz" ? jazzDurabilityTier : undefined,
@@ -325,6 +335,9 @@ export function BenchConsole() {
             </button>
             <button type="button" onClick={() => void run("create", { count: 100 })}>
               Create 100
+            </button>
+            <button type="button" onClick={() => void run("createOne")}>
+              Create 1
             </button>
             <button type="button" onClick={() => void run("create", { count: 1000 })}>
               Create 1k

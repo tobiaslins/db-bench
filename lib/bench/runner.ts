@@ -31,6 +31,10 @@ export async function runBench(adapter: BenchAdapter, request: BenchRequest) {
     return timed(() => adapter.createItems(count, options));
   }
 
+  if (operation === "createOne") {
+    return timed(() => adapter.createItems(1, options));
+  }
+
   if (operation === "select10") {
     return timed(() => adapter.select10(options));
   }
@@ -60,16 +64,18 @@ export async function runBench(adapter: BenchAdapter, request: BenchRequest) {
   }
 
   if (operation === "suite") {
-    const create = await timed(() => adapter.createItems(count, options));
+    const createOne = await timed(() => adapter.createItems(1, options));
+    const create1k = await timed(() => adapter.createItems(1000, options));
     const select10 = await timed(() => adapter.select10(options));
     const selectTopN = await timed(() => adapter.selectTopN(n, options));
-    const id = create.result.firstId;
+    const id = create1k.result.firstId;
     const getById = id ? await timed(() => adapter.getById(id, options)) : null;
     const updateById = id ? await timed(() => adapter.updateById(id, options)) : null;
     const updateTopN = await timed(() => adapter.updateTopN(n, options));
 
     return {
-      create,
+      createOne,
+      create1k,
       select10,
       selectTopN,
       getById,

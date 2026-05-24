@@ -34,13 +34,14 @@ Providers:
 
 Operations:
 
+- `createOne`: inserts 1 item
 - `create`: inserts `count` items, capped at `1000`
 - `select10`: returns 10 rows/items
 - `selectTopN`: returns the highest `n` rows/items by `ordinal`
 - `getById`: returns one row/item by `id`
 - `updateTopN`: updates the highest `n` rows/items by `ordinal`
 - `updateById`: updates one row/item by `id`
-- `suite`: runs create, select10, selectTopN, and getById
+- `suite`: runs createOne, create1k, select10, selectTopN, getById, updateById, and updateTopN
 
 Pass `runId` to isolate reads and updates to one benchmark run. If omitted, the API generates one for the request and returns it from create/suite results.
 For Jazz reads, pass `jazzDurabilityTier` and `jazzLocalUpdates` (`deferred` or `immediate`) to control read settlement behavior.

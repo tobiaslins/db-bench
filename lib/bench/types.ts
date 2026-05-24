@@ -2,6 +2,7 @@ export type BenchProvider = "jazz" | "postgres" | "turso";
 
 export type BenchOperation =
   | "setup"
+  | "createOne"
   | "create"
   | "select10"
   | "selectTopN"
