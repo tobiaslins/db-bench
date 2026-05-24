@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { BenchOperation, BenchProvider, JazzDurabilityTier } from "../lib/bench/types";
+import type { BenchOperation, BenchProvider, JazzDurabilityTier, JazzLocalUpdates } from "../lib/bench/types";
 
 type BenchResponse = {
   provider?: BenchProvider;
@@ -27,6 +27,7 @@ type CompareResult = {
 const providers: BenchProvider[] = ["jazz", "turso"];
 const operations: BenchOperation[] = ["suite", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
 const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "edge", "local"];
+const jazzLocalUpdatesOptions: JazzLocalUpdates[] = ["deferred", "immediate"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -127,6 +128,7 @@ export function BenchConsole() {
   const [id, setId] = useState("");
   const [runId, setRunId] = useState("");
   const [jazzDurabilityTier, setJazzDurabilityTier] = useState<JazzDurabilityTier>("global");
+  const [jazzLocalUpdates, setJazzLocalUpdates] = useState<JazzLocalUpdates>("deferred");
   const [status, setStatus] = useState<RunState>("idle");
   const [compareStatus, setCompareStatus] = useState<CompareState>("idle");
   const [response, setResponse] = useState<BenchResponse | null>(null);
@@ -145,6 +147,7 @@ export function BenchConsole() {
       id: id || undefined,
       runId: runId || undefined,
       jazzDurabilityTier: provider === "jazz" ? jazzDurabilityTier : undefined,
+      jazzLocalUpdates: provider === "jazz" ? jazzLocalUpdates : undefined,
     };
 
     const result = (await fetch(`/api/bench/${provider}`, {
@@ -169,6 +172,7 @@ export function BenchConsole() {
       n,
       runId: nextRunId,
       jazzDurabilityTier: nextProvider === "jazz" ? jazzDurabilityTier : undefined,
+      jazzLocalUpdates: nextProvider === "jazz" ? jazzLocalUpdates : undefined,
     };
 
     return (await fetch(`/api/bench/${nextProvider}`, {
@@ -246,21 +250,39 @@ export function BenchConsole() {
           </label>
 
           {provider === "jazz" ? (
-            <fieldset>
-              <legend>Jazz Durability</legend>
-              <div className="segmented three">
-                {jazzDurabilityTiers.map((item) => (
-                  <button
-                    className={item === jazzDurabilityTier ? "active" : ""}
-                    key={item}
-                    onClick={() => setJazzDurabilityTier(item)}
-                    type="button"
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+            <>
+              <fieldset>
+                <legend>Jazz Durability</legend>
+                <div className="segmented three">
+                  {jazzDurabilityTiers.map((item) => (
+                    <button
+                      className={item === jazzDurabilityTier ? "active" : ""}
+                      key={item}
+                      onClick={() => setJazzDurabilityTier(item)}
+                      type="button"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Jazz Local Updates</legend>
+                <div className="segmented">
+                  {jazzLocalUpdatesOptions.map((item) => (
+                    <button
+                      className={item === jazzLocalUpdates ? "active" : ""}
+                      key={item}
+                      onClick={() => setJazzLocalUpdates(item)}
+                      type="button"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            </>
           ) : null}
 
           <div className="grid2">

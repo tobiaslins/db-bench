@@ -10,9 +10,11 @@ export type BenchOperation =
   | "updateById"
   | "suite";
 export type JazzDurabilityTier = "local" | "edge" | "global";
+export type JazzLocalUpdates = "immediate" | "deferred";
 
 export type BenchOptions = {
   jazzDurabilityTier?: JazzDurabilityTier;
+  jazzLocalUpdates?: JazzLocalUpdates;
   runId: string;
 };
 
@@ -55,6 +57,7 @@ export type BenchRequest = {
   id?: string;
   runId?: string;
   jazzDurabilityTier?: JazzDurabilityTier;
+  jazzLocalUpdates?: JazzLocalUpdates;
 };
 
 export type TimedResult<T> = {

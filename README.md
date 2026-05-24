@@ -41,6 +41,7 @@ Operations:
 - `suite`: runs create, select10, selectTopN, and getById
 
 Pass `runId` to isolate reads and updates to one benchmark run. If omitted, the API generates one for the request and returns it from create/suite results.
+For Jazz reads, pass `jazzDurabilityTier` and `jazzLocalUpdates` (`deferred` or `immediate`) to control read settlement behavior.
 
 Examples:
 

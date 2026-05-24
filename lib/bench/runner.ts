@@ -17,6 +17,7 @@ export async function runBench(adapter: BenchAdapter, request: BenchRequest) {
   const n = clampInteger(request.n, 10, 1000);
   const options = {
     jazzDurabilityTier: request.jazzDurabilityTier,
+    jazzLocalUpdates: request.jazzLocalUpdates,
     runId: request.runId || makeRunId(),
   };
 

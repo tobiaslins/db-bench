@@ -31,6 +31,7 @@ function getDurabilityTier(options?: BenchOptions): JazzDurabilityTier {
 function getReadOptions(options?: BenchOptions) {
   return {
     tier: getDurabilityTier(options),
+    localUpdates: options?.jazzLocalUpdates ?? "deferred",
     propagation: process.env.JAZZ_SERVER_URL ? "full" : "local-only",
   } as const;
 }
