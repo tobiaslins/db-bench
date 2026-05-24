@@ -162,11 +162,12 @@ export function BenchConsole() {
     setStatus(result.error ? "error" : "done");
   }
 
-  async function runProviderSuite(nextProvider: BenchProvider) {
+  async function runProviderSuite(nextProvider: BenchProvider, nextRunId: string) {
     const body = {
       operation: "suite",
       count,
       n,
+      runId: nextRunId,
       jazzDurabilityTier: nextProvider === "jazz" ? jazzDurabilityTier : undefined,
     };
 
@@ -181,9 +182,11 @@ export function BenchConsole() {
     setCompareStatus("running");
     setCompareResult(null);
 
-    const [jazz, turso] = await Promise.all([runProviderSuite("jazz"), runProviderSuite("turso")]);
+    const nextRunId = `compare-${Date.now()}`;
+    const [jazz, turso] = await Promise.all([runProviderSuite("jazz", nextRunId), runProviderSuite("turso", nextRunId)]);
     const hasError = Boolean(jazz.error || turso.error);
 
+    setRunId(nextRunId);
     setCompareResult({
       jazz,
       turso,
