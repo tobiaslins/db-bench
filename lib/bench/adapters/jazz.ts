@@ -74,7 +74,6 @@ function getContext() {
       serverUrl: process.env.JAZZ_SERVER_URL,
       backendSecret: getBackendSecret(),
       adminSecret: process.env.JAZZ_ADMIN_SECRET,
-      tier: getDurabilityTier(),
     });
   }
 
