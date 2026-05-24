@@ -6,6 +6,7 @@ import type { BenchAdapter, BenchItem, BenchOptions, JazzDurabilityTier } from "
 import { jazzApp, jazzPermissions } from "./jazz-app";
 
 type JazzRow = typeof jazzApp.benchItems._rowType;
+type JazzDriver = { type: "memory" } | { type: "persistent"; dataPath: string };
 
 let context: ReturnType<typeof createJazzContext> | undefined;
 
@@ -34,19 +35,41 @@ function getReadOptions(options?: BenchOptions) {
   } as const;
 }
 
-function getContext() {
-  if (!context) {
+function getDriver(): JazzDriver {
+  const configured = process.env.JAZZ_DRIVER;
+
+  if (configured === "memory") {
+    return { type: "memory" };
+  }
+
+  if (configured === "persistent") {
     const dataDir = process.env.JAZZ_DATA_DIR ?? join(process.cwd(), ".jazz");
     mkdirSync(dataDir, { recursive: true });
+    return {
+      type: "persistent",
+      dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
+    };
+  }
 
+  if (process.env.VERCEL && process.env.JAZZ_SERVER_URL) {
+    return { type: "memory" };
+  }
+
+  const dataDir = process.env.JAZZ_DATA_DIR ?? join(process.cwd(), ".jazz");
+  mkdirSync(dataDir, { recursive: true });
+  return {
+    type: "persistent",
+    dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
+  };
+}
+
+function getContext() {
+  if (!context) {
     context = createJazzContext({
       appId: process.env.JAZZ_APP_ID ?? "db-bench",
       app: jazzApp,
       permissions: jazzPermissions,
-      driver: {
-        type: "persistent",
-        dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
-      },
+      driver: getDriver(),
       serverUrl: process.env.JAZZ_SERVER_URL,
       backendSecret: getBackendSecret(),
       adminSecret: process.env.JAZZ_ADMIN_SECRET,
