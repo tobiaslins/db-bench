@@ -1,4 +1,4 @@
-export type BenchProvider = "turso" | "jazz";
+export type BenchProvider = "jazz" | "postgres" | "turso";
 
 export type BenchOperation =
   | "setup"

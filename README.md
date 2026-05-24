@@ -11,6 +11,7 @@ pnpm dev
 ```
 
 Turso needs `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
+Postgres needs `POSTGRES_URL` or `DATABASE_URL`. Set `POSTGRES_SSL=false` for local databases if needed.
 Jazz uses `jazz-tools@alpha`. Set `JAZZ_SERVER_URL`, `JAZZ_APP_ID`, `JAZZ_ADMIN_SECRET`, and `BACKEND_SECRET` to benchmark against Jazz Cloud. Use `JAZZ_DURABILITY_TIER=global` for cloud-confirmed writes and reads.
 On Vercel, the Jazz adapter defaults to `JAZZ_DRIVER=memory` to avoid writing a `.jazz` directory in serverless functions.
 
@@ -29,6 +30,7 @@ Providers:
 
 - `turso`
 - `jazz`
+- `postgres`
 
 Operations:
 

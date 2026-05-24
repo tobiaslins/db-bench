@@ -13,11 +13,13 @@
     "@tursodatabase/serverless": "1.2.0-pre.2",
     "jazz-tools": "2.0.0-alpha.49",
     "next": "16.2.6",
+    "pg": "^8.21.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@types/node": "25.9.1",
+    "@types/pg": "^8.20.0",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
     "typescript": "6.0.3"

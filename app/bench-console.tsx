@@ -14,17 +14,15 @@ type RunState = "idle" | "running" | "done" | "error";
 type CompareState = "idle" | "running" | "done" | "error";
 type CompareRow = {
   operation: string;
-  jazzMs: number | null;
-  tursoMs: number | null;
+  timings: Record<BenchProvider, number | null>;
   winner: BenchProvider | "tie" | "none";
 };
 type CompareResult = {
-  jazz: BenchResponse;
-  turso: BenchResponse;
+  responses: Record<BenchProvider, BenchResponse>;
   rows: CompareRow[];
 };
 
-const providers: BenchProvider[] = ["jazz", "turso"];
+const providers: BenchProvider[] = ["jazz", "postgres", "turso"];
 const operations: BenchOperation[] = ["suite", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
 const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "edge", "local"];
 const jazzLocalUpdatesOptions: JazzLocalUpdates[] = ["deferred", "immediate"];
@@ -97,20 +95,24 @@ function suiteTiming(response: BenchResponse, key: string): number | null {
   return entry.ms;
 }
 
-function buildCompareRows(jazz: BenchResponse, turso: BenchResponse): CompareRow[] {
+function buildCompareRows(responses: Record<BenchProvider, BenchResponse>): CompareRow[] {
   return ["create", "select10", "selectTopN", "getById", "updateById", "updateTopN"].map((operation) => {
-    const jazzMs = suiteTiming(jazz, operation);
-    const tursoMs = suiteTiming(turso, operation);
+    const timings = Object.fromEntries(providers.map((item) => [item, suiteTiming(responses[item], operation)])) as Record<
+      BenchProvider,
+      number | null
+    >;
+    const measured = providers.filter((item) => timings[item] !== null);
     let winner: CompareRow["winner"] = "none";
 
-    if (jazzMs !== null && tursoMs !== null) {
-      winner = jazzMs === tursoMs ? "tie" : jazzMs < tursoMs ? "jazz" : "turso";
+    if (measured.length > 0) {
+      const fastest = measured.reduce((best, item) => ((timings[item] ?? Infinity) < (timings[best] ?? Infinity) ? item : best));
+      const fastestMs = timings[fastest];
+      winner = measured.every((item) => timings[item] === fastestMs) ? "tie" : fastest;
     }
 
     return {
       operation,
-      jazzMs,
-      tursoMs,
+      timings,
       winner,
     };
   });
@@ -187,14 +189,14 @@ export function BenchConsole() {
     setCompareResult(null);
 
     const nextRunId = `compare-${Date.now()}`;
-    const [jazz, turso] = await Promise.all([runProviderSuite("jazz", nextRunId), runProviderSuite("turso", nextRunId)]);
-    const hasError = Boolean(jazz.error || turso.error);
+    const results = await Promise.all(providers.map(async (item) => [item, await runProviderSuite(item, nextRunId)] as const));
+    const responses = Object.fromEntries(results) as Record<BenchProvider, BenchResponse>;
+    const hasError = providers.some((item) => Boolean(responses[item].error));
 
     setRunId(nextRunId);
     setCompareResult({
-      jazz,
-      turso,
-      rows: buildCompareRows(jazz, turso),
+      responses,
+      rows: buildCompareRows(responses),
     });
     setCompareStatus(hasError ? "error" : "done");
   }
@@ -374,16 +376,24 @@ export function BenchConsole() {
           <span>{compareStatus}</span>
         </div>
 
-        {compareResult?.jazz.error ? <div className="errorBox">Jazz: {compareResult.jazz.error}</div> : null}
-        {compareResult?.turso.error ? <div className="errorBox">Turso: {compareResult.turso.error}</div> : null}
+        {compareResult
+          ? providers.map((item) =>
+              compareResult.responses[item].error ? (
+                <div className="errorBox" key={item}>
+                  {item}: {compareResult.responses[item].error}
+                </div>
+              ) : null,
+            )
+          : null}
 
         <div className="tableScroller">
           <table className="compareTable">
             <thead>
               <tr>
                 <th>Operation</th>
-                <th>Jazz</th>
-                <th>Turso</th>
+                {providers.map((item) => (
+                  <th key={item}>{item}</th>
+                ))}
                 <th>Faster</th>
               </tr>
             </thead>
@@ -392,14 +402,17 @@ export function BenchConsole() {
                 compareResult.rows.map((row) => (
                   <tr key={row.operation}>
                     <td>{row.operation}</td>
-                    <td className={row.winner === "jazz" ? "winnerCell" : ""}>{formatMs(row.jazzMs)}</td>
-                    <td className={row.winner === "turso" ? "winnerCell" : ""}>{formatMs(row.tursoMs)}</td>
+                    {providers.map((item) => (
+                      <td className={row.winner === item ? "winnerCell" : ""} key={item}>
+                        {formatMs(row.timings[item])}
+                      </td>
+                    ))}
                     <td>{row.winner === "none" ? "-" : row.winner}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4}>Run all to compare both providers.</td>
+                  <td colSpan={providers.length + 2}>Run all to compare providers.</td>
                 </tr>
               )}
             </tbody>
