@@ -13,10 +13,12 @@ export type JazzDurabilityTier = "local" | "edge" | "global";
 
 export type BenchOptions = {
   jazzDurabilityTier?: JazzDurabilityTier;
+  runId: string;
 };
 
 export type BenchItem = {
   id: string;
+  runId: string;
   ordinal: number;
   value: string;
   createdAt: number;
@@ -24,12 +26,14 @@ export type BenchItem = {
 
 export type CreateResult = {
   count: number;
+  runId: string;
   firstId?: string;
   lastId?: string;
 };
 
 export type UpdateResult = {
   count: number;
+  runId: string;
   ids: string[];
 };
 
@@ -49,6 +53,7 @@ export type BenchRequest = {
   count?: number;
   n?: number;
   id?: string;
+  runId?: string;
   jazzDurabilityTier?: JazzDurabilityTier;
 };
 

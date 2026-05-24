@@ -1,0 +1,30 @@
+{
+  "benchItems": {
+    "columns": [
+      {
+        "name": "ordinal",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "value",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "createdAt",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      }
+    ],
+    "indexed_columns": [
+      "ordinal"
+    ]
+  }
+}

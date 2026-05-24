@@ -11,6 +11,18 @@ type BenchResponse = {
 };
 
 type RunState = "idle" | "running" | "done" | "error";
+type CompareState = "idle" | "running" | "done" | "error";
+type CompareRow = {
+  operation: string;
+  jazzMs: number | null;
+  tursoMs: number | null;
+  winner: BenchProvider | "tie" | "none";
+};
+type CompareResult = {
+  jazz: BenchResponse;
+  turso: BenchResponse;
+  rows: CompareRow[];
+};
 
 const providers: BenchProvider[] = ["jazz", "turso"];
 const operations: BenchOperation[] = ["suite", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
@@ -38,6 +50,24 @@ function findFirstId(response: BenchResponse): string | null {
   return null;
 }
 
+function findRunId(response: BenchResponse): string | null {
+  const result = response.result;
+
+  if (!isRecord(result)) return null;
+
+  const direct = result.result;
+  if (isRecord(direct) && typeof direct.runId === "string") {
+    return direct.runId;
+  }
+
+  const create = result.create;
+  if (isRecord(create) && isRecord(create.result) && typeof create.result.runId === "string") {
+    return create.result.runId;
+  }
+
+  return null;
+}
+
 function collectTimings(value: unknown, prefix = ""): Array<{ label: string; ms: number }> {
   if (!isRecord(value)) return [];
 
@@ -56,15 +86,51 @@ function collectTimings(value: unknown, prefix = ""): Array<{ label: string; ms:
   return timings;
 }
 
+function suiteTiming(response: BenchResponse, key: string): number | null {
+  const result = response.result;
+  if (!isRecord(result)) return null;
+
+  const entry = result[key];
+  if (!isRecord(entry) || typeof entry.ms !== "number") return null;
+
+  return entry.ms;
+}
+
+function buildCompareRows(jazz: BenchResponse, turso: BenchResponse): CompareRow[] {
+  return ["create", "select10", "selectTopN", "getById", "updateById", "updateTopN"].map((operation) => {
+    const jazzMs = suiteTiming(jazz, operation);
+    const tursoMs = suiteTiming(turso, operation);
+    let winner: CompareRow["winner"] = "none";
+
+    if (jazzMs !== null && tursoMs !== null) {
+      winner = jazzMs === tursoMs ? "tie" : jazzMs < tursoMs ? "jazz" : "turso";
+    }
+
+    return {
+      operation,
+      jazzMs,
+      tursoMs,
+      winner,
+    };
+  });
+}
+
+function formatMs(ms: number | null): string {
+  return ms === null ? "-" : `${ms.toFixed(3)} ms`;
+}
+
 export function BenchConsole() {
   const [provider, setProvider] = useState<BenchProvider>("jazz");
   const [operation, setOperation] = useState<BenchOperation>("suite");
   const [count, setCount] = useState(100);
   const [n, setN] = useState(10);
   const [id, setId] = useState("");
+  const [runId, setRunId] = useState("");
   const [jazzDurabilityTier, setJazzDurabilityTier] = useState<JazzDurabilityTier>("global");
   const [status, setStatus] = useState<RunState>("idle");
+  const [compareStatus, setCompareStatus] = useState<CompareState>("idle");
   const [response, setResponse] = useState<BenchResponse | null>(null);
+  const [compareResult, setCompareResult] = useState<CompareResult | null>(null);
 
   const timings = useMemo(() => collectTimings(response?.result), [response]);
 
@@ -77,6 +143,7 @@ export function BenchConsole() {
       count: overrides.count ?? count,
       n: overrides.n ?? n,
       id: id || undefined,
+      runId: runId || undefined,
       jazzDurabilityTier: provider === "jazz" ? jazzDurabilityTier : undefined,
     };
 
@@ -88,9 +155,41 @@ export function BenchConsole() {
 
     const firstId = findFirstId(result);
     if (firstId) setId(firstId);
+    const nextRunId = findRunId(result);
+    if (nextRunId) setRunId(nextRunId);
 
     setResponse(result);
     setStatus(result.error ? "error" : "done");
+  }
+
+  async function runProviderSuite(nextProvider: BenchProvider) {
+    const body = {
+      operation: "suite",
+      count,
+      n,
+      jazzDurabilityTier: nextProvider === "jazz" ? jazzDurabilityTier : undefined,
+    };
+
+    return (await fetch(`/api/bench/${nextProvider}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    }).then((res) => res.json())) as BenchResponse;
+  }
+
+  async function runAll() {
+    setCompareStatus("running");
+    setCompareResult(null);
+
+    const [jazz, turso] = await Promise.all([runProviderSuite("jazz"), runProviderSuite("turso")]);
+    const hasError = Boolean(jazz.error || turso.error);
+
+    setCompareResult({
+      jazz,
+      turso,
+      rows: buildCompareRows(jazz, turso),
+    });
+    setCompareStatus(hasError ? "error" : "done");
   }
 
   return (
@@ -100,7 +199,12 @@ export function BenchConsole() {
           <h1>DB Bench</h1>
           <p>Turso and Jazz alpha benchmark runner</p>
         </div>
-        <div className={`status status-${status}`}>{status}</div>
+        <div className="topActions">
+          <a className="textLink" href="/jazz-client">
+            Jazz Client Rows
+          </a>
+          <div className={`status status-${status}`}>{status}</div>
+        </div>
       </header>
 
       <section className="workspace">
@@ -172,11 +276,23 @@ export function BenchConsole() {
             <input value={id} onChange={(event) => setId(event.target.value)} placeholder="auto-filled after create/suite" />
           </label>
 
+          <label>
+            Run ID
+            <input value={runId} onChange={(event) => setRunId(event.target.value)} placeholder="auto-filled after create/suite" />
+          </label>
+
           <button className="primary" disabled={status === "running"} type="submit">
             {status === "running" ? "Running..." : "Run"}
           </button>
 
+          <button className="secondary" disabled={compareStatus === "running"} type="button" onClick={() => void runAll()}>
+            {compareStatus === "running" ? "Running All..." : "Run All Compare"}
+          </button>
+
           <div className="quick">
+            <button type="button" onClick={() => setRunId("")}>
+              New Run
+            </button>
             <button type="button" onClick={() => void run("suite")}>
               Suite
             </button>
@@ -225,6 +341,45 @@ export function BenchConsole() {
 
           <pre>{response ? JSON.stringify(response, null, 2) : "Run a benchmark to see output."}</pre>
         </section>
+      </section>
+
+      <section className="compareWrap panel">
+        <div className="resultHeader">
+          <h2>Compare</h2>
+          <span>{compareStatus}</span>
+        </div>
+
+        {compareResult?.jazz.error ? <div className="errorBox">Jazz: {compareResult.jazz.error}</div> : null}
+        {compareResult?.turso.error ? <div className="errorBox">Turso: {compareResult.turso.error}</div> : null}
+
+        <div className="tableScroller">
+          <table className="compareTable">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Jazz</th>
+                <th>Turso</th>
+                <th>Faster</th>
+              </tr>
+            </thead>
+            <tbody>
+              {compareResult ? (
+                compareResult.rows.map((row) => (
+                  <tr key={row.operation}>
+                    <td>{row.operation}</td>
+                    <td className={row.winner === "jazz" ? "winnerCell" : ""}>{formatMs(row.jazzMs)}</td>
+                    <td className={row.winner === "turso" ? "winnerCell" : ""}>{formatMs(row.tursoMs)}</td>
+                    <td>{row.winner === "none" ? "-" : row.winner}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>Run all to compare both providers.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   );

@@ -32,6 +32,22 @@ select {
   max-width: 1180px;
 }
 
+.topActions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.textLink {
+  color: #167755;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+}
+
 h1,
 h2,
 p {
@@ -180,6 +196,13 @@ select {
   font-weight: 720;
 }
 
+.secondary {
+  background: #24324b;
+  border-color: #24324b;
+  color: #ffffff;
+  font-weight: 720;
+}
+
 .quick {
   display: grid;
   gap: 8px;
@@ -221,7 +244,8 @@ select {
   padding: 18px 18px 0;
 }
 
-.timings div {
+.timings div,
+.metricStack div {
   background: #f6fbf7;
   border: 1px solid #cce7d4;
   border-radius: 8px;
@@ -230,14 +254,56 @@ select {
   padding: 10px;
 }
 
-.timings span {
+.timings span,
+.metricStack span {
   color: #5a695e;
   font-size: 12px;
 }
 
-.timings strong {
+.timings strong,
+.metricStack strong {
   color: #145f46;
   font-size: 16px;
+}
+
+.metricStack {
+  display: grid;
+  gap: 8px;
+}
+
+.compareWrap {
+  margin: 20px auto 0;
+  max-width: 1180px;
+  overflow: hidden;
+}
+
+.tableScroller {
+  overflow-x: auto;
+}
+
+.compareTable {
+  border-collapse: collapse;
+  min-width: 640px;
+  width: 100%;
+}
+
+.compareTable th,
+.compareTable td {
+  border-bottom: 1px solid #ebe8df;
+  padding: 12px 18px;
+  text-align: left;
+}
+
+.compareTable th {
+  color: #6a6862;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.winnerCell {
+  background: #ddf5e4;
+  color: #145f46;
+  font-weight: 800;
 }
 
 pre {
@@ -258,6 +324,11 @@ pre {
   }
 
   .topbar {
+    align-items: start;
+    display: grid;
+  }
+
+  .topActions {
     align-items: start;
     display: grid;
   }

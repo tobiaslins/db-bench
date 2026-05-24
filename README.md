@@ -39,6 +39,8 @@ Operations:
 - `updateById`: updates one row/item by `id`
 - `suite`: runs create, select10, selectTopN, and getById
 
+Pass `runId` to isolate reads and updates to one benchmark run. If omitted, the API generates one for the request and returns it from create/suite results.
+
 Examples:
 
 ```bash

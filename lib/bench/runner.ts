@@ -1,5 +1,5 @@
 import type { BenchAdapter, BenchOperation, BenchRequest, TimedResult } from "./types";
-import { clampInteger } from "./items";
+import { clampInteger, makeRunId } from "./items";
 
 async function timed<T>(run: () => Promise<T>): Promise<TimedResult<T>> {
   const startedAt = performance.now();
@@ -17,9 +17,9 @@ export async function runBench(adapter: BenchAdapter, request: BenchRequest) {
   const n = clampInteger(request.n, 10, 1000);
   const options = {
     jazzDurabilityTier: request.jazzDurabilityTier,
+    runId: request.runId || makeRunId(),
   };
 
-  console.log("operation", {options});
   if (operation === "setup") {
     return timed(() => adapter.setup(options));
   }

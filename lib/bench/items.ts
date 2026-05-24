@@ -1,12 +1,17 @@
 import { randomUUID } from "crypto";
 import type { BenchItem } from "./types";
 
-export function makeItems(count: number): BenchItem[] {
+export function makeRunId(): string {
+  return `run-${Date.now()}-${randomUUID().slice(0, 8)}`;
+}
+
+export function makeItems(count: number, runId: string): BenchItem[] {
   const now = Math.floor(Date.now() / 1000);
   const ordinalBase = (now % 1_000_000) * 1000;
 
   return Array.from({ length: count }, (_, index) => ({
     id: randomUUID(),
+    runId,
     ordinal: ordinalBase + index,
     value: `item-${now}-${index}`,
     createdAt: now,

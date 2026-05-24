@@ -73,7 +73,8 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async createItems(count, options) {
-    const items = makeItems(count);
+    const runId = options?.runId ?? "unknown-run";
+    const items = makeItems(count, runId);
     const db = getDb();
     const batch = db.beginBatch();
 
@@ -81,6 +82,7 @@ export const jazzAdapter: BenchAdapter = {
       batch.insert(
         jazzApp.benchItems,
         {
+          runId: item.runId,
           ordinal: item.ordinal,
           value: item.value,
           createdAt: item.createdAt,
@@ -94,13 +96,14 @@ export const jazzAdapter: BenchAdapter = {
 
     return {
       count: items.length,
+      runId,
       firstId: items[0]?.id,
       lastId: items.at(-1)?.id,
     };
   },
 
   async select10(options) {
-    const rows = await getDb().all(jazzApp.benchItems.limit(10), {
+    const rows = await getDb().all(jazzApp.benchItems.where({ runId: options?.runId ?? "unknown-run" }).limit(10), {
       ...getReadOptions(options),
     });
 
@@ -108,9 +111,12 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async selectTopN(n, options) {
-    const rows = await getDb().all(jazzApp.benchItems.orderBy("ordinal", "desc").limit(n), {
-      ...getReadOptions(options),
-    });
+    const rows = await getDb().all(
+      jazzApp.benchItems.where({ runId: options?.runId ?? "unknown-run" }).orderBy("ordinal", "desc").limit(n),
+      {
+        ...getReadOptions(options),
+      },
+    );
 
     return rows.map(toItem);
   },
@@ -124,6 +130,7 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async updateTopN(n, options) {
+    const runId = options?.runId ?? "unknown-run";
     const rows = await this.selectTopN(n, options);
     const db = getDb();
     const batch = db.beginBatch();
@@ -139,6 +146,7 @@ export const jazzAdapter: BenchAdapter = {
 
     return {
       count: rows.length,
+      runId,
       ids: rows.map((row) => row.id),
     };
   },
@@ -153,6 +161,7 @@ export const jazzAdapter: BenchAdapter = {
 
     return {
       count: 1,
+      runId: options?.runId ?? "unknown-run",
       ids: [id],
     };
   },
