@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tursodatabase/serverless": "1.2.0-pre.2",
-    "jazz-tools": "2.0.0-alpha.49",
+    "jazz-tools": "2.0.0-alpha.52",
     "next": "16.2.6",
     "pg": "^8.21.0",
     "react": "19.2.6",
