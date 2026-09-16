@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["jazz-tools", "jazz-napi", "@garden-co/jazz-napi-linux-x64-gnu"],
+  serverExternalPackages: ["jazz-tools", "jazz-napi"],
   outputFileTracingIncludes: {
     "/*": ["node_modules/@garden-co/jazz-napi-linux-x64-gnu/**/*"],
   },
