@@ -7,8 +7,6 @@
     "dev": "next dev",
     "jazz:server": "node scripts/jazz-server.mjs",
     "jazz:server:persistent": "node scripts/jazz-server.mjs --persistent",
-    "jazz:disable-zstd": "node scripts/patch-jazz-disable-zstd.mjs",
-    "postinstall": "node scripts/patch-jazz-disable-zstd.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit"

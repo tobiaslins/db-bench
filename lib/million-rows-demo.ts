@@ -12,6 +12,8 @@ export const DEMO_SEED_BATCH_SIZE = 1_000;
 export type DemoRow = {
   id: string;
   ownerId: string;
+  ownerIssuer: string;
+  ownerSubject: string;
   ownerIndex: number;
   ordinal: number;
   payload: string;
@@ -91,6 +93,8 @@ export function demoRow(ownerIndex: number, ordinal: number): DemoRow {
   return {
     id: demoRowId(ownerIndex, ordinal),
     ownerId: demoOwnerId(ownerIndex),
+    ownerIssuer: DEMO_OWNER_ISSUER,
+    ownerSubject: demoOwnerSubject(ownerIndex),
     ownerIndex,
     ordinal,
     payload: `${demoOwnerSubject(ownerIndex)}-row-${String(ordinal).padStart(5, "0")}`,

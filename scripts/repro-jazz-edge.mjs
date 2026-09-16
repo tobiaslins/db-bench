@@ -52,6 +52,8 @@ const appSchema = {
   demoRows: s
     .table({
       ownerId: s.string(),
+      ownerIssuer: s.string(),
+      ownerSubject: s.string(),
       ownerIndex: s.int(),
       ordinal: s.int(),
       payload: s.string(),
@@ -65,10 +67,12 @@ const permissions = s.definePermissions(app, ({ policy, session }) => [
   policy.benchItems.allowInsert.always(),
   policy.benchItems.allowUpdate.always(),
   policy.benchItems.allowDelete.always(),
-  policy.demoRows.allowRead.where({ ownerId: session.user }),
-  policy.demoRows.allowInsert.where({ ownerId: session.user }),
-  policy.demoRows.allowUpdate.whereOld({ ownerId: session.user }).whereNew({ ownerId: session.user }),
-  policy.demoRows.allowDelete.where({ ownerId: session.user }),
+  policy.demoRows.allowRead.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
+  policy.demoRows.allowInsert.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
+  policy.demoRows.allowUpdate
+    .whereOld({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject })
+    .whereNew({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
+  policy.demoRows.allowDelete.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
 ]);
 
 const ownerSession = {
@@ -106,6 +110,8 @@ try {
     app.demoRows,
     {
       ownerId,
+      ownerIssuer: ownerSession.issuer,
+      ownerSubject: ownerSession.user_id,
       ownerIndex: 0,
       ordinal: started % 1_000_000,
       payload: `repro-${started}`,
@@ -137,6 +143,8 @@ try {
     app.demoRows,
     {
       ownerId,
+      ownerIssuer: ownerSession.issuer,
+      ownerSubject: ownerSession.user_id,
       ownerIndex: 0,
       ordinal: (started % 1_000_000) + 1,
       payload: `repro-edge-${started}`,

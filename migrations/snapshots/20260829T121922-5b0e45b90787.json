@@ -45,6 +45,20 @@
         "nullable": false
       },
       {
+        "name": "ownerIssuer",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "ownerSubject",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
         "name": "ownerIndex",
         "column_type": {
           "type": "Integer"

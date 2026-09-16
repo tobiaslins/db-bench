@@ -42,6 +42,8 @@ export async function POST(request: Request) {
               row.id,
               {
                 ownerId: row.ownerId,
+                ownerIssuer: row.ownerIssuer,
+                ownerSubject: row.ownerSubject,
                 ownerIndex: row.ownerIndex,
                 ordinal: row.ordinal,
                 payload: row.payload,

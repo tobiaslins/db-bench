@@ -9,3 +9,5 @@ tsconfig.tsbuildinfo
 *.db
 *.db-*
 .vercel
+.env*
+/\[SENSITIVE\]

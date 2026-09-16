@@ -10,6 +10,8 @@ export default s.defineMigration({
   to: {
     "demoRows": s.table({
       "ownerId": s.string(),
+      "ownerIssuer": s.string(),
+      "ownerSubject": s.string(),
       "ownerIndex": s.int(),
       "ordinal": s.int(),
       "payload": s.string(),
