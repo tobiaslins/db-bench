@@ -68,6 +68,12 @@ h2 {
   margin-top: 6px;
 }
 
+.topbar .envLine {
+  color: #8a867d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
 .status {
   border: 1px solid #d8d6ce;
   border-radius: 999px;
@@ -127,6 +133,12 @@ label {
   font-size: 13px;
   font-weight: 650;
   gap: 8px;
+}
+
+.hintText {
+  color: #6a6862;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .segmented {
@@ -304,6 +316,15 @@ select {
   background: #ddf5e4;
   color: #145f46;
   font-weight: 800;
+}
+
+.demoTableWrap {
+  margin: 18px;
+}
+
+.monoCell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
 }
 
 pre {

@@ -3,7 +3,9 @@ node_modules
 tsconfig.tsbuildinfo
 .DS_Store
 .env
+.env.local
 .jazz
+.jazz-server
 *.db
 *.db-*
 .vercel

@@ -1,0 +1,81 @@
+{
+  "benchItems": {
+    "columns": [
+      {
+        "name": "runId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "ordinal",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "value",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "createdAt",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      }
+    ],
+    "indexed_columns": [
+      "runId",
+      "ordinal"
+    ]
+  },
+  "demoRows": {
+    "columns": [
+      {
+        "name": "ownerId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "ownerIndex",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "ordinal",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "payload",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "createdAt",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      }
+    ],
+    "indexed_columns": [
+      "ownerId",
+      "createdAt"
+    ]
+  }
+}

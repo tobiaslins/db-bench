@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdapter } from "../../../../lib/bench/adapters";
+import { getBenchEnvInfo } from "../../../../lib/bench/env-info";
 import { runBench } from "../../../../lib/bench/runner";
 import type { BenchRequest } from "../../../../lib/bench/types";
 
@@ -23,6 +24,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({
       provider: adapter.name,
       operation: body.operation ?? "suite",
+      env: getBenchEnvInfo(adapter.name),
       result,
     });
   } catch (error) {
@@ -31,6 +33,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json(
       {
         provider,
+        env: getBenchEnvInfo(provider),
         error: message,
       },
       { status: 400 },

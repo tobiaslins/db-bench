@@ -5,14 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "jazz:server": "node scripts/jazz-server.mjs",
+    "jazz:server:persistent": "node scripts/jazz-server.mjs --persistent",
+    "jazz:disable-zstd": "node scripts/patch-jazz-disable-zstd.mjs",
+    "postinstall": "node scripts/patch-jazz-disable-zstd.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tursodatabase/serverless": "1.2.0-pre.2",
-    "jazz-tools": "2.0.0-alpha.52",
-    "next": "16.2.6",
+    "jazz-napi": "2.0.0-alpha.55",
+    "jazz-tools": "2.0.0-alpha.55",
+    "jazz-wasm": "2.0.0-alpha.55",
+    "next": "16.3.3",
     "pg": "^8.21.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"
@@ -22,6 +28,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
+    "create-jazz": "2.0.0-alpha.55",
     "typescript": "6.0.3"
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"

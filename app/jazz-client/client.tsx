@@ -12,7 +12,7 @@ type JazzClientRowsProps = {
 
 const tiers: JazzDurabilityTier[] = ["edge", "global", "local"];
 
-function RowsView({ initialRunId }: { initialRunId: string }) {
+function RowsView({ appId, initialRunId, serverUrl }: { appId: string; initialRunId: string; serverUrl?: string }) {
   const [runId, setRunId] = useState(initialRunId);
   const [limit, setLimit] = useState(25);
   const [tier, setTier] = useState<JazzDurabilityTier>("edge");
@@ -28,10 +28,8 @@ function RowsView({ initialRunId }: { initialRunId: string }) {
     return jazzApp.benchItems.where({ runId: trimmed }).orderBy("ordinal", "desc").limit(limit);
   }, [limit, runId]);
 
-  const rows = useAll(query, {
-    tier,
-    propagation: "full",
-  });
+  const result = useAll(query, { tier });
+  const rows = result.data;
 
   useEffect(() => {
     if (!runId.trim()) {
@@ -60,6 +58,7 @@ function RowsView({ initialRunId }: { initialRunId: string }) {
         <div>
           <h1>Jazz Client Rows</h1>
           <p>Rendered directly in the browser with useAll</p>
+          <p className="envLine">app={appId} server={serverUrl ?? "none"}</p>
         </div>
         <a className="textLink" href="/">
           Benchmark
@@ -104,9 +103,10 @@ function RowsView({ initialRunId }: { initialRunId: string }) {
         <section className="panel results">
           <div className="resultHeader">
             <h2>Rows</h2>
-            <span>{rows ? `${rows.length}` : "loading"}</span>
+            <span>{result.isLoading ? "loading" : `${rows?.length ?? 0}`}</span>
           </div>
 
+          {result.error ? <div className="errorBox">{result.error.message}</div> : null}
           <pre>{rows ? JSON.stringify(rows, null, 2) : "Waiting for Jazz subscription..."}</pre>
         </section>
       </section>
@@ -116,12 +116,13 @@ function RowsView({ initialRunId }: { initialRunId: string }) {
 
 export function JazzClientRows({ appId, serverUrl }: JazzClientRowsProps) {
   const [mounted, setMounted] = useState(false);
-  const config = useMemo(
+  const providerProps = useMemo(
     () => ({
       appId,
-      serverUrl,
+      serverUrl: serverUrl ?? "http://localhost:1625/",
       driver: { type: "persistent" as const },
       dbName: `db-bench-client-${appId}`,
+      initial: "local-first" as const,
     }),
     [appId, serverUrl],
   );
@@ -135,8 +136,8 @@ export function JazzClientRows({ appId, serverUrl }: JazzClientRowsProps) {
   }
 
   return (
-    <JazzProvider config={config} fallback={<main className="shell">Loading Jazz...</main>}>
-      <RowsView initialRunId="" />
+    <JazzProvider {...providerProps} fallback={<main className="shell">Loading Jazz...</main>}>
+      <RowsView appId={appId} initialRunId="" serverUrl={serverUrl} />
     </JazzProvider>
   );
 }

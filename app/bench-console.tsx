@@ -6,6 +6,7 @@ import type { BenchOperation, BenchProvider, JazzDurabilityTier, JazzLocalUpdate
 type BenchResponse = {
   provider?: BenchProvider;
   operation?: BenchOperation;
+  env?: unknown;
   result?: unknown;
   error?: string;
 };
@@ -222,6 +223,9 @@ export function BenchConsole() {
           <a className="textLink" href="/jazz-client">
             Jazz Client Rows
           </a>
+          <a className="textLink" href="/million-rows">
+            Million Rows
+          </a>
           <div className={`status status-${status}`}>{status}</div>
         </div>
       </header>
@@ -367,6 +371,7 @@ export function BenchConsole() {
           </div>
 
           {response?.error ? <div className="errorBox">{response.error}</div> : null}
+          {response?.env ? <pre>{JSON.stringify(response.env, null, 2)}</pre> : null}
 
           {timings.length > 0 ? (
             <div className="timings">
