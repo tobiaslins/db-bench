@@ -35,6 +35,10 @@ export function getJazzReadOptions(options?: BenchOptions) {
 }
 
 function getDriver(): JazzDriver {
+  if (process.env.VERCEL) {
+    return { type: "memory" };
+  }
+
   const configured = process.env.JAZZ_DRIVER;
 
   if (configured === "memory") {
@@ -48,10 +52,6 @@ function getDriver(): JazzDriver {
       type: "persistent",
       dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
     };
-  }
-
-  if (process.env.VERCEL && process.env.JAZZ_SERVER_URL) {
-    return { type: "memory" };
   }
 
   const dataDir = process.env.JAZZ_DATA_DIR ?? join(process.cwd(), ".jazz");
