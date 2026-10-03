@@ -6,7 +6,6 @@ import {
   DEMO_ROWS_PER_OWNER,
   DEMO_SEED_BATCH_SIZE,
   clampInt,
-  demoOwnerSession,
   demoRow,
   normalizeTier,
   timeoutMs,
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
 
   try {
     for (let ownerIndex = ownerStart; ownerIndex < ownerStart + ownerCount; ownerIndex += 1) {
-      const db = getJazzContext().forSession(demoOwnerSession(ownerIndex));
+      const db = getJazzContext().asBackend();
 
       for (let batchStart = rowStart; batchStart < rowStart + rowCount; batchStart += DEMO_SEED_BATCH_SIZE) {
         const batchEnd = Math.min(batchStart + DEMO_SEED_BATCH_SIZE, rowStart + rowCount);
