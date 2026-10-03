@@ -12,14 +12,14 @@ importers:
         specifier: 1.2.0-pre.2
         version: 1.2.0-pre.2
       jazz-napi:
-        specifier: 2.0.0-alpha.55
-        version: 2.0.0-alpha.55
+        specifier: 2.0.0-alpha.58
+        version: 2.0.0-alpha.58
       jazz-tools:
-        specifier: 2.0.0-alpha.55
-        version: 2.0.0-alpha.55(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.15)(react@19.2.6))(react@19.2.6)
+        specifier: 2.0.0-alpha.58
+        version: 2.0.0-alpha.58(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.15)(react@19.2.6))(react@19.2.6)
       jazz-wasm:
-        specifier: 2.0.0-alpha.55
-        version: 2.0.0-alpha.55
+        specifier: 2.0.0-alpha.58
+        version: 2.0.0-alpha.58
       next:
         specifier: 16.3.3
         version: 16.3.3(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -46,8 +46,8 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.15)
       create-jazz:
-        specifier: 2.0.0-alpha.55
-        version: 2.0.0-alpha.55
+        specifier: 2.0.0-alpha.58
+        version: 2.0.0-alpha.58
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -290,23 +290,28 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.55':
-    resolution: {integrity: sha512-hGrf7i/3O5Hyh2tOm7kPMSHhEqTfU8ScWwwIPmiK3d0jCeAXxZ+HR1Al+Kc+tdQOPRN8OE/tKtt0kzG2Si7Vyw==}
+  '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.58':
+    resolution: {integrity: sha512-hJ55+7sRGXQrBiUZdAdYDnSoK/Nqhh1Kf1H4KN9+peiDp2cWoxDo4W8anY83nEyI3PCDQZZ1w8iwK0qM6Z1p8Q==}
     cpu: [arm64]
     os: [darwin]
 
-  '@garden-co/jazz-napi-darwin-x64@2.0.0-alpha.55':
-    resolution: {integrity: sha512-CzZZP3JI+ktOO++J3/LtyjhJ0kHxvm3mYr/q7BoDcGuqELkdo8bATHAh9InKO1ngPj8KiURHyTxG+84Saxq4mw==}
+  '@garden-co/jazz-napi-darwin-x64@2.0.0-alpha.58':
+    resolution: {integrity: sha512-LChZXW7F+8f8rmAJF6qo6HMIhr21Sfgbo288FGt3lb632PhOzzNfLOQDkv5eSs/y4jmbLz9mCwQ5l9x0cjl6Sg==}
     cpu: [x64]
     os: [darwin]
 
-  '@garden-co/jazz-napi-linux-x64-gnu@2.0.0-alpha.55':
-    resolution: {integrity: sha512-oz1PUJnr/xd3Zdx0JIE01BMR6PeoJcfY8xlOJCIYD78duofCrBzzGNpsyS1QV7aUWxwulOml2LDFdbOmezXqtg==}
+  '@garden-co/jazz-napi-linux-arm64-gnu@2.0.0-alpha.58':
+    resolution: {integrity: sha512-bbR012Wlf7EB5mk1OFo7+58wN4FZnIuyklSdHUQZ2K6S9l4PikiEvVrFIOZKy8tcWUQxfAbLoxOVH8X3Ic/MUA==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@garden-co/jazz-napi-linux-x64-gnu@2.0.0-alpha.58':
+    resolution: {integrity: sha512-KyX25oun91snlXarBD1RRx9u4NNx7voptKjlqBqspQa7Ft8YhKfsYEE998yXMA0fLY9wkwZyPkBEzxwNeOy9aQ==}
     cpu: [x64]
     os: [linux]
 
-  '@garden-co/jazz-napi-win32-x64-msvc@2.0.0-alpha.55':
-    resolution: {integrity: sha512-gA6zAoi1VsBuGSPFeDaK7LdzSLlYBmIuugsJiJDv6G4tn6PRzPsWhqpNfwOICEpZBLaZYqigJxbOgBdZpWfqlA==}
+  '@garden-co/jazz-napi-win32-x64-msvc@2.0.0-alpha.58':
+    resolution: {integrity: sha512-X5Mc/kwb+H0JuzOCr+kNzUM9lAEbBVqQgFjHlYPTLVS6sOxc6Fy46lYg7l+gsOq1fLb8E//zFQzzBrl/zh46hQ==}
     cpu: [x64]
     os: [win32]
 
@@ -906,8 +911,8 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  create-jazz@2.0.0-alpha.55:
-    resolution: {integrity: sha512-t/TQcBsC+pL8ot4SnmzLzxBy+lWHEnjGfW6l/L+xvYQu5+4xF7TziWDFWUBqbQr6IPD0zsvwxntV/ji4M0pE/w==}
+  create-jazz@2.0.0-alpha.58:
+    resolution: {integrity: sha512-6S8hlG2ClAhDnuwvyYOogc20OmYuW1qGuGJvX1GPIlg8fr5JHBipPapyF8pyuFXdqkRC8YLJlnttqg9u2L7/SA==}
     engines: {node: '>=22.12'}
     hasBin: true
 
@@ -1137,19 +1142,20 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jazz-napi@2.0.0-alpha.55:
-    resolution: {integrity: sha512-SUUp+WIihML6qT6ss0YORinpJKn2u+fe4Rfjj4VuMC87UksX0z/2GgJz8HW1Mv+GuetjGuuXKTuGGDQR2JmQzg==}
+  jazz-napi@2.0.0-alpha.58:
+    resolution: {integrity: sha512-yn1vDi3khIUq9FzUKQTbOUL9nJsf/o81a4I3vSAC1xSubnJ1g80hCpQrG6kmijs9sTG5S5fFRocM+Om87nnWtw==}
 
-  jazz-tools@2.0.0-alpha.55:
-    resolution: {integrity: sha512-kU+PRdcI2jFWD7WPas9IPAs0+OcOKGZGIcrTQN/gCdmkqpxt0S6Mbs0uKpKamd/c2DQUuqmh6L3rbscM3rPMhA==}
+  jazz-tools@2.0.0-alpha.58:
+    resolution: {integrity: sha512-ggl0IlmVoGFjB4Igq8MNOn2Be+956lP1T7ROu7MkfRTeSO52S2DmtzmYPpkxJn75yrUrKLljcUeGL8ihVVTJCA==}
     engines: {node: '>=22.12'}
     hasBin: true
     peerDependencies:
       better-auth: 1.7.1
+      effect: ^4.0.0-rc.118
       expo: '>=54'
       expo-crypto: '>=14.0.0'
       expo-secure-store: '>=14.0.0'
-      jazz-rn: 2.0.0-alpha.55
+      jazz-rn: 2.0.0-alpha.58
       react: '>=19'
       react-native: '>=0.76'
       solid-js: '>=1.9.13'
@@ -1157,6 +1163,8 @@ packages:
       vue: ^3.5.0
     peerDependenciesMeta:
       better-auth:
+        optional: true
+      effect:
         optional: true
       expo:
         optional: true
@@ -1177,8 +1185,8 @@ packages:
       vue:
         optional: true
 
-  jazz-wasm@2.0.0-alpha.55:
-    resolution: {integrity: sha512-SQeIvGXEZMwGBWqR9kf3gVRrRwpaEriz6Zmycua5br0bjQTxGdvQzz4DbQZ4Ss8k4MxnAfBGTsaBUGwo63zLKw==}
+  jazz-wasm@2.0.0-alpha.58:
+    resolution: {integrity: sha512-ux4Uzb3Ig0L4jR7XYLiOoUF7mktRL3e4qCIJTU5gHMAMKiKnYPWQPa57EomL3lpMfXg/81PdLvkNA+z6GSiiQQ==}
 
   jest-get-type@29.6.3:
     resolution: {integrity: sha512-zrteXnqYxfQh7l5FHyL38jL39di8H8rHoecLH3JNxH3BwOrBsNeabdap5e0I23lD4HHI8W5VFBZqG4Eaq5LNcw==}
@@ -1474,10 +1482,6 @@ packages:
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
-
-  pluralize-esm@9.0.5:
-    resolution: {integrity: sha512-Kb2dcpMsIutFw2hYrN0EhsAXOUJTd6FVMIxvNAkZCMQLVt9NGZqQczvGpYDxNWCZeCWLHUPxQIBudWzt1h7VVA==}
-    engines: {node: '>=14.0.0'}
 
   postcss@8.5.23:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
@@ -2049,16 +2053,19 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.55':
+  '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.58':
     optional: true
 
-  '@garden-co/jazz-napi-darwin-x64@2.0.0-alpha.55':
+  '@garden-co/jazz-napi-darwin-x64@2.0.0-alpha.58':
     optional: true
 
-  '@garden-co/jazz-napi-linux-x64-gnu@2.0.0-alpha.55':
+  '@garden-co/jazz-napi-linux-arm64-gnu@2.0.0-alpha.58':
     optional: true
 
-  '@garden-co/jazz-napi-win32-x64-msvc@2.0.0-alpha.55':
+  '@garden-co/jazz-napi-linux-x64-gnu@2.0.0-alpha.58':
+    optional: true
+
+  '@garden-co/jazz-napi-win32-x64-msvc@2.0.0-alpha.58':
     optional: true
 
   '@img/colour@1.1.0':
@@ -2656,7 +2663,7 @@ snapshots:
   convert-source-map@2.0.0:
     optional: true
 
-  create-jazz@2.0.0-alpha.55:
+  create-jazz@2.0.0-alpha.58:
     dependencies:
       '@clack/prompts': 0.10.1
       picocolors: 1.1.1
@@ -2924,14 +2931,15 @@ snapshots:
   isexe@2.0.0:
     optional: true
 
-  jazz-napi@2.0.0-alpha.55:
+  jazz-napi@2.0.0-alpha.58:
     optionalDependencies:
-      '@garden-co/jazz-napi-darwin-arm64': 2.0.0-alpha.55
-      '@garden-co/jazz-napi-darwin-x64': 2.0.0-alpha.55
-      '@garden-co/jazz-napi-linux-x64-gnu': 2.0.0-alpha.55
-      '@garden-co/jazz-napi-win32-x64-msvc': 2.0.0-alpha.55
+      '@garden-co/jazz-napi-darwin-arm64': 2.0.0-alpha.58
+      '@garden-co/jazz-napi-darwin-x64': 2.0.0-alpha.58
+      '@garden-co/jazz-napi-linux-arm64-gnu': 2.0.0-alpha.58
+      '@garden-co/jazz-napi-linux-x64-gnu': 2.0.0-alpha.58
+      '@garden-co/jazz-napi-win32-x64-msvc': 2.0.0-alpha.58
 
-  jazz-tools@2.0.0-alpha.55(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.15)(react@19.2.6))(react@19.2.6):
+  jazz-tools@2.0.0-alpha.58(react-native@0.85.3(@babel/core@7.29.0)(@types/react@19.2.15)(react@19.2.6))(react@19.2.6):
     dependencies:
       '@noble/hashes': 2.0.1
       '@opentelemetry/api': 1.9.1
@@ -2944,21 +2952,20 @@ snapshots:
       '@standard-schema/spec': 1.1.0
       esbuild: 0.27.7
       fs-native-extensions: 1.5.0
-      jazz-wasm: 2.0.0-alpha.55
+      jazz-wasm: 2.0.0-alpha.58
       jose: 6.2.3
       json-schema-to-ts: 3.1.1
-      pluralize-esm: 9.0.5
       tr46: 5.1.1
       web-streams-polyfill: 4.3.0
       whatwg-url-without-unicode: 8.0.0-3
     optionalDependencies:
-      jazz-napi: 2.0.0-alpha.55
+      jazz-napi: 2.0.0-alpha.58
       react: 19.2.6
       react-native: 0.85.3(@babel/core@7.29.0)(@types/react@19.2.15)(react@19.2.6)
     transitivePeerDependencies:
       - bare-url
 
-  jazz-wasm@2.0.0-alpha.55: {}
+  jazz-wasm@2.0.0-alpha.58: {}
 
   jest-get-type@29.6.3:
     optional: true
@@ -3400,8 +3407,6 @@ snapshots:
 
   picomatch@4.0.4:
     optional: true
-
-  pluralize-esm@9.0.5: {}
 
   postcss@8.5.23:
     dependencies:

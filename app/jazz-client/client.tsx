@@ -10,12 +10,12 @@ type JazzClientRowsProps = {
   serverUrl?: string;
 };
 
-const tiers: JazzDurabilityTier[] = ["edge", "global", "local"];
+const tiers: JazzDurabilityTier[] = ["global", "local"];
 
 function RowsView({ appId, initialRunId, serverUrl }: { appId: string; initialRunId: string; serverUrl?: string }) {
   const [runId, setRunId] = useState(initialRunId);
   const [limit, setLimit] = useState(25);
-  const [tier, setTier] = useState<JazzDurabilityTier>("edge");
+  const [tier, setTier] = useState<JazzDurabilityTier>("global");
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [firstLoadMs, setFirstLoadMs] = useState<number | null>(null);
   const [lastUpdateMs, setLastUpdateMs] = useState<number | null>(null);

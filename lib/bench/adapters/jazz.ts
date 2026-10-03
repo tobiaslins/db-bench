@@ -21,9 +21,11 @@ export function getJazzDurabilityTier(options?: BenchOptions): JazzDurabilityTie
 
   const configured = process.env.JAZZ_DURABILITY_TIER;
 
-  if (configured === "edge" || configured === "global" || configured === "local") {
+  if (configured === "global" || configured === "local") {
     return configured;
   }
+
+  if (configured === "edge") return "global";
 
   return process.env.JAZZ_SERVER_URL ? "global" : "local";
 }

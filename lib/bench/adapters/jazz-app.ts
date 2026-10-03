@@ -7,7 +7,7 @@ export const jazzSchema = {
       ordinal: s.int(),
       value: s.string(),
       createdAt: s.int(),
-    })
+    }, {})
     .indexOnly(["runId", "ordinal"]),
   demoRows: s
     .table({
@@ -18,7 +18,7 @@ export const jazzSchema = {
       ordinal: s.int(),
       payload: s.string(),
       createdAt: s.int(),
-    })
+    }, {})
     .indexOnly(["ownerId", "createdAt"]),
 };
 

@@ -25,7 +25,7 @@ type CompareResult = {
 
 const providers: BenchProvider[] = ["jazz", "postgres", "turso"];
 const operations: BenchOperation[] = ["suite", "createOne", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
-const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "edge", "local"];
+const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "local"];
 const jazzLocalUpdatesOptions: JazzLocalUpdates[] = ["deferred", "immediate"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {

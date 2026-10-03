@@ -16,6 +16,6 @@ export default s.defineMigration({
       "ordinal": s.int(),
       "payload": s.string(),
       "createdAt": s.int(),
-    }),
+    }, {}),
   },
 });

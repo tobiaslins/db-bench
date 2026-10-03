@@ -10,7 +10,7 @@ export type BenchOperation =
   | "updateTopN"
   | "updateById"
   | "suite";
-export type JazzDurabilityTier = "local" | "edge" | "global";
+export type JazzDurabilityTier = "local" | "global";
 export type JazzLocalUpdates = "immediate" | "deferred";
 
 export type BenchOptions = {

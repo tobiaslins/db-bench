@@ -47,7 +47,7 @@ type CountResponse = {
 
 type LoadState = "idle" | "running" | "done" | "error";
 
-const tiers: DurabilityTier[] = ["edge", "global", "local"];
+const tiers: DurabilityTier[] = ["global", "local"];
 
 function fmt(value: number) {
   return Intl.NumberFormat("en-US").format(value);

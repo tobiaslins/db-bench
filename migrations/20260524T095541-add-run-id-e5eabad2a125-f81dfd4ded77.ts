@@ -13,7 +13,7 @@ export default s.defineMigration({
     "ordinal": s.int(),
     "value": s.string(),
     "createdAt": s.int(),
-  })
+  }, {})
 },
   to: {
   "benchItems": s.table({
@@ -21,6 +21,6 @@ export default s.defineMigration({
     "ordinal": s.int(),
     "value": s.string(),
     "createdAt": s.int(),
-  })
+  }, {})
 },
 });

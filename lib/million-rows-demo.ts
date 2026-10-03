@@ -36,7 +36,8 @@ export function clampInt(value: unknown, fallback: number, min: number, max: num
 }
 
 export function normalizeTier(value: unknown): DurabilityTier {
-  return value === "local" || value === "edge" || value === "global" ? value : "edge";
+  if (value === "local" || value === "global") return value;
+  return "global";
 }
 
 export function timeoutMs(value: unknown) {

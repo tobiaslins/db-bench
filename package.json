@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@tursodatabase/serverless": "1.2.0-pre.2",
-    "jazz-napi": "2.0.0-alpha.55",
-    "jazz-tools": "2.0.0-alpha.55",
-    "jazz-wasm": "2.0.0-alpha.55",
+    "jazz-napi": "2.0.0-alpha.58",
+    "jazz-tools": "2.0.0-alpha.58",
+    "jazz-wasm": "2.0.0-alpha.58",
     "next": "16.3.3",
     "pg": "^8.21.0",
     "react": "19.2.6",
@@ -26,7 +26,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
-    "create-jazz": "2.0.0-alpha.55",
+    "create-jazz": "2.0.0-alpha.58",
     "typescript": "6.0.3"
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"
