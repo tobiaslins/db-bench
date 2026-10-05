@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "cle1"
+  ],
+  "functions": {
+    "app/api/bench/jazz/route.ts": {
+      "regions": [
+        "fra1"
+      ]
+    }
+  }
+}

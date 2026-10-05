@@ -4,6 +4,7 @@ export function getBenchEnvInfo(provider?: string) {
   return {
     provider,
     runtime: process.env.VERCEL ? "vercel" : "local",
+    region: process.env.VERCEL_REGION ?? null,
     jazz: {
       appId: process.env.JAZZ_APP_ID ?? "db-bench",
       serverUrl: process.env.JAZZ_SERVER_URL ?? null,
