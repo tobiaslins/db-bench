@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { userIdentity, type DurabilityTier } from "jazz-tools";
+import { userIdentity } from "jazz-tools";
 
 export const DEMO_OWNER_COUNT = 1_000;
 export const DEMO_ROWS_PER_OWNER = 10_000;
@@ -7,7 +7,11 @@ export const DEMO_TOTAL_ROWS = DEMO_OWNER_COUNT * DEMO_ROWS_PER_OWNER;
 export const DEMO_OWNER_ISSUER = "db-bench-million-rows";
 export const DEMO_CREATED_AT_BASE = 1_800_000_000;
 export const DEMO_REQUEST_TIMEOUT_MS = 20_000;
-export const DEMO_SEED_BATCH_SIZE = 1_000;
+export const DEMO_SEED_BATCH_SIZE = 50;
+export const DEMO_USER_HEADER = "x-db-bench-demo-user";
+
+export type DemoReadTier = "local-first" | "remote";
+export type DemoWriteTier = "local" | "global";
 
 export type DemoRow = {
   id: string;
@@ -20,13 +24,6 @@ export type DemoRow = {
   createdAt: number;
 };
 
-export type DemoSession = {
-  issuer: string;
-  user_id: string;
-  claims: Record<string, unknown>;
-  authMode: "external";
-};
-
 export function clampInt(value: unknown, fallback: number, min: number, max: number) {
   const parsed = Number(value);
 
@@ -35,9 +32,13 @@ export function clampInt(value: unknown, fallback: number, min: number, max: num
   return Math.min(Math.max(parsed, min), max);
 }
 
-export function normalizeTier(value: unknown): DurabilityTier {
-  if (value === "local" || value === "global") return value;
-  return "global";
+export function normalizeReadTier(value: unknown): DemoReadTier {
+  if (value === "local" || value === "local-first") return "local-first";
+  return "remote";
+}
+
+export function normalizeWriteTier(value: unknown): DemoWriteTier {
+  return value === "local" || value === "local-first" ? "local" : "global";
 }
 
 export function timeoutMs(value: unknown) {
@@ -67,15 +68,6 @@ export function demoOwnerSubject(ownerIndex: number) {
 
 export function demoOwnerId(ownerIndex: number) {
   return userIdentity(DEMO_OWNER_ISSUER, demoOwnerSubject(ownerIndex));
-}
-
-export function demoOwnerSession(ownerIndex: number): DemoSession {
-  return {
-    issuer: DEMO_OWNER_ISSUER,
-    user_id: demoOwnerSubject(ownerIndex),
-    claims: { demoOwnerIndex: ownerIndex },
-    authMode: "external",
-  };
 }
 
 export function demoRowId(ownerIndex: number, ordinal: number) {

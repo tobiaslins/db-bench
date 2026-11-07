@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getJazzContext } from "../../../../lib/bench/adapters/jazz";
 import { jazzApp } from "../../../../lib/bench/adapters/jazz-app";
 import {
   DEMO_OWNER_COUNT,
@@ -7,11 +6,11 @@ import {
   DEMO_TOTAL_ROWS,
   clampInt,
   demoOwnerId,
-  demoOwnerSession,
-  normalizeTier,
+  normalizeReadTier,
   timeoutMs,
   withTimeout,
 } from "../../../../lib/million-rows-demo";
+import { getDemoOwnerDb } from "../../../../lib/million-rows-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,7 +22,7 @@ export async function GET(request: Request) {
   const ownerIndex = clampInt(url.searchParams.get("ownerIndex"), 0, 0, DEMO_OWNER_COUNT - 1);
   const limit = clampInt(url.searchParams.get("limit"), 50, 1, 250);
   const offset = clampInt(url.searchParams.get("offset"), 0, 0, DEMO_ROWS_PER_OWNER - 1);
-  const tier = normalizeTier(url.searchParams.get("tier"));
+  const tier = normalizeReadTier(url.searchParams.get("tier"));
   const waitTimeoutMs = timeoutMs(url.searchParams.get("timeoutMs"));
   const debug = url.searchParams.get("debug") === "1";
   const profile = url.searchParams.get("profile") === "1";
@@ -37,7 +36,7 @@ export async function GET(request: Request) {
   try {
     const ownerId = demoOwnerId(ownerIndex);
     mark("parsed");
-    const db = getJazzContext().forSession(demoOwnerSession(ownerIndex));
+    const db = await getDemoOwnerDb(request, ownerIndex);
     mark("sessionDb");
 
     if (profile) {

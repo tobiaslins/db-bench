@@ -3,19 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { JazzProvider, useAll } from "jazz-tools/react";
 import { jazzApp } from "../../lib/bench/adapters/jazz-app";
-import type { JazzDurabilityTier } from "../../lib/bench/types";
 
 type JazzClientRowsProps = {
-  appId: string;
-  serverUrl?: string;
+  scope: string;
 };
 
-const tiers: JazzDurabilityTier[] = ["global", "local"];
+type JazzReadTier = "local-first" | "remote";
 
-function RowsView({ appId, initialRunId, serverUrl }: { appId: string; initialRunId: string; serverUrl?: string }) {
+const tiers: JazzReadTier[] = ["remote", "local-first"];
+
+function RowsView({ scope, initialRunId }: { scope: string; initialRunId: string }) {
   const [runId, setRunId] = useState(initialRunId);
   const [limit, setLimit] = useState(25);
-  const [tier, setTier] = useState<JazzDurabilityTier>("global");
+  const [tier, setTier] = useState<JazzReadTier>("remote");
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [firstLoadMs, setFirstLoadMs] = useState<number | null>(null);
   const [lastUpdateMs, setLastUpdateMs] = useState<number | null>(null);
@@ -58,7 +58,7 @@ function RowsView({ appId, initialRunId, serverUrl }: { appId: string; initialRu
         <div>
           <h1>Jazz Client Rows</h1>
           <p>Rendered directly in the browser with useAll</p>
-          <p className="envLine">app={appId} server={serverUrl ?? "none"}</p>
+          <p className="envLine">scope={scope} server=/jazz</p>
         </div>
         <a className="textLink" href="/">
           Benchmark
@@ -114,18 +114,8 @@ function RowsView({ appId, initialRunId, serverUrl }: { appId: string; initialRu
   );
 }
 
-export function JazzClientRows({ appId, serverUrl }: JazzClientRowsProps) {
+export function JazzClientRows({ scope }: JazzClientRowsProps) {
   const [mounted, setMounted] = useState(false);
-  const providerProps = useMemo(
-    () => ({
-      appId,
-      serverUrl: serverUrl ?? "http://localhost:1625/",
-      driver: { type: "persistent" as const },
-      dbName: `db-bench-client-${appId}`,
-      initial: "local-first" as const,
-    }),
-    [appId, serverUrl],
-  );
 
   useEffect(() => {
     setMounted(true);
@@ -136,8 +126,14 @@ export function JazzClientRows({ appId, serverUrl }: JazzClientRowsProps) {
   }
 
   return (
-    <JazzProvider {...providerProps} fallback={<main className="shell">Loading Jazz...</main>}>
-      <RowsView appId={appId} initialRunId="" serverUrl={serverUrl} />
+    <JazzProvider
+      client={() => import("jazz-tools/local-first")}
+      initial="local-first"
+      loading={<main className="shell">Loading Jazz...</main>}
+      scope={scope}
+      serverUrl="/jazz"
+    >
+      <RowsView scope={scope} initialRunId="" />
     </JazzProvider>
   );
 }

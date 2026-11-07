@@ -1,8 +1,13 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import type { DurabilityTier } from "jazz-tools";
-import { DEMO_OWNER_COUNT, DEMO_ROWS_PER_OWNER, DEMO_TOTAL_ROWS } from "../../lib/million-rows-demo";
+import {
+  DEMO_OWNER_COUNT,
+  DEMO_ROWS_PER_OWNER,
+  DEMO_TOTAL_ROWS,
+  type DemoReadTier,
+  type DemoWriteTier,
+} from "../../lib/million-rows-demo";
 
 type SeedResponse = {
   ownerStart?: number;
@@ -47,7 +52,8 @@ type CountResponse = {
 
 type LoadState = "idle" | "running" | "done" | "error";
 
-const tiers: DurabilityTier[] = ["global", "local"];
+const writeTiers: DemoWriteTier[] = ["global", "local"];
+const readTiers: DemoReadTier[] = ["remote", "local-first"];
 
 function fmt(value: number) {
   return Intl.NumberFormat("en-US").format(value);
@@ -62,8 +68,8 @@ export function MillionRowsDemo() {
   const [seedOwnerStart, setSeedOwnerStart] = useState(0);
   const [pageSize, setPageSize] = useState(50);
   const [offset, setOffset] = useState(0);
-  const [seedTier, setSeedTier] = useState<DurabilityTier>("local");
-  const [readTier, setReadTier] = useState<DurabilityTier>("local");
+  const [seedTier, setSeedTier] = useState<DemoWriteTier>("global");
+  const [readTier, setReadTier] = useState<DemoReadTier>("remote");
   const [seedStatus, setSeedStatus] = useState<LoadState>("idle");
   const [pageStatus, setPageStatus] = useState<LoadState>("idle");
   const [countStatus, setCountStatus] = useState<LoadState>("idle");
@@ -208,7 +214,7 @@ export function MillionRowsDemo() {
           <fieldset>
             <legend>Seed Wait Tier</legend>
             <div className="segmented three">
-              {tiers.map((item) => (
+              {writeTiers.map((item) => (
                 <button className={item === seedTier ? "active" : ""} key={item} onClick={() => setSeedTier(item)} type="button">
                   {item}
                 </button>
@@ -219,7 +225,7 @@ export function MillionRowsDemo() {
           <fieldset>
             <legend>Read Tier</legend>
             <div className="segmented three">
-              {tiers.map((item) => (
+              {readTiers.map((item) => (
                 <button className={item === readTier ? "active" : ""} key={item} onClick={() => setReadTier(item)} type="button">
                   {item}
                 </button>
@@ -228,7 +234,7 @@ export function MillionRowsDemo() {
           </fieldset>
 
           <p className="hintText">
-            Rows seeded with local wait may only be visible to local reads until the sync server catches up.
+            Global writes wait for Jazz Cloud. Remote reads wait for the backend store; local-first reads may use cached data.
           </p>
 
           <div className="grid2">

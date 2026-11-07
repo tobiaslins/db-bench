@@ -1,18 +1,9 @@
-import { mkdirSync } from "fs";
-import { join } from "path";
-import { createJazzContext } from "../../../node_modules/jazz-tools/dist/backend/create-jazz-context.js";
+import { jazz } from "../../../jazz.server";
 import { makeItems, makeUpdateValue } from "../items";
 import type { BenchAdapter, BenchItem, BenchOptions, JazzDurabilityTier } from "../types";
-import { jazzApp, jazzPermissions } from "./jazz-app";
+import { jazzApp } from "./jazz-app";
 
 type JazzRow = typeof jazzApp.benchItems._rowType;
-type JazzDriver = { type: "memory" } | { type: "persistent"; dataPath: string };
-
-let context: ReturnType<typeof createJazzContext> | undefined;
-
-export function getJazzBackendSecret() {
-  return process.env.JAZZ_BACKEND_SECRET || process.env.BACKEND_SECRET;
-}
 
 export function getJazzDurabilityTier(options?: BenchOptions): JazzDurabilityTier {
   if (options?.jazzDurabilityTier) {
@@ -32,56 +23,8 @@ export function getJazzDurabilityTier(options?: BenchOptions): JazzDurabilityTie
 
 export function getJazzReadOptions(options?: BenchOptions) {
   return {
-    tier: getJazzDurabilityTier(options),
+    tier: getJazzDurabilityTier(options) === "global" ? "remote" : "local-first",
   } as const;
-}
-
-function getDriver(): JazzDriver {
-  if (process.env.VERCEL) {
-    return { type: "memory" };
-  }
-
-  const configured = process.env.JAZZ_DRIVER;
-
-  if (configured === "memory") {
-    return { type: "memory" };
-  }
-
-  if (configured === "persistent") {
-    const dataDir = process.env.JAZZ_DATA_DIR ?? join(process.cwd(), ".jazz");
-    mkdirSync(dataDir, { recursive: true });
-    return {
-      type: "persistent",
-      dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
-    };
-  }
-
-  const dataDir = process.env.JAZZ_DATA_DIR ?? join(process.cwd(), ".jazz");
-  mkdirSync(dataDir, { recursive: true });
-  return {
-    type: "persistent",
-    dataPath: process.env.JAZZ_DATA_PATH ?? join(dataDir, "bench.db"),
-  };
-}
-
-export function getJazzContext() {
-  if (!context) {
-    context = createJazzContext({
-      appId: process.env.JAZZ_APP_ID ?? "db-bench",
-      app: jazzApp,
-      permissions: jazzPermissions,
-      driver: getDriver(),
-      serverUrl: process.env.JAZZ_SERVER_URL,
-      backendSecret: getJazzBackendSecret(),
-      adminSecret: process.env.JAZZ_ADMIN_SECRET,
-    });
-  }
-
-  return context;
-}
-
-function getDb() {
-  return process.env.JAZZ_SERVER_URL || getJazzBackendSecret() ? getJazzContext().asBackend() : getJazzContext().db();
 }
 
 function toItem(row: JazzRow): BenchItem {
@@ -92,13 +35,13 @@ export const jazzAdapter: BenchAdapter = {
   name: "jazz",
 
   async setup() {
-    getDb();
+    await jazz.ready();
   },
 
   async createItems(count, options) {
     const runId = options?.runId ?? "unknown-run";
     const items = makeItems(count, runId);
-    const db = getDb();
+    const db = jazz.db;
 
     const commit = await db.transaction((tx: any) => {
       for (const item of items) {
@@ -116,7 +59,6 @@ export const jazzAdapter: BenchAdapter = {
     });
 
     await commit.wait({ tier: getJazzDurabilityTier(options) });
-    getJazzContext().flush();
 
     return {
       count: items.length,
@@ -127,7 +69,7 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async select10(options) {
-    const rows = await getDb().all(jazzApp.benchItems.where({ runId: options?.runId ?? "unknown-run" }).limit(10), {
+    const rows = await jazz.db.all(jazzApp.benchItems.where({ runId: options?.runId ?? "unknown-run" }).orderBy("ordinal", "asc").limit(10), {
       ...getJazzReadOptions(options),
     });
 
@@ -135,7 +77,7 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async selectTopN(n, options) {
-    const rows = await getDb().all(
+    const rows = await jazz.db.all(
       jazzApp.benchItems.where({ runId: options?.runId ?? "unknown-run" }).orderBy("ordinal", "desc").limit(n),
       getJazzReadOptions(options),
     );
@@ -144,7 +86,7 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async getById(id, options) {
-    const item = await getDb().one(jazzApp.benchItems.where({ id }), {
+    const item = await jazz.db.one(jazzApp.benchItems.where({ id }), {
       ...getJazzReadOptions(options),
     });
 
@@ -154,7 +96,7 @@ export const jazzAdapter: BenchAdapter = {
   async updateTopN(n, options) {
     const runId = options?.runId ?? "unknown-run";
     const rows = await this.selectTopN(n, options);
-    const db = getDb();
+    const db = jazz.db;
 
     const commit = await db.transaction((tx: any) => {
       rows.forEach((row, index) => {
@@ -165,7 +107,6 @@ export const jazzAdapter: BenchAdapter = {
     });
 
     await commit.wait({ tier: getJazzDurabilityTier(options) });
-    getJazzContext().flush();
 
     return {
       count: rows.length,
@@ -175,12 +116,11 @@ export const jazzAdapter: BenchAdapter = {
   },
 
   async updateById(id, options) {
-    const db = getDb();
+    const db = jazz.db;
 
     await db.update(jazzApp.benchItems, id, {
       value: makeUpdateValue(0),
     }).wait({ tier: getJazzDurabilityTier(options) });
-    getJazzContext().flush();
 
     return {
       count: 1,

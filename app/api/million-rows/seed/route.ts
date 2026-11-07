@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getJazzContext } from "../../../../lib/bench/adapters/jazz";
+import { jazz } from "../../../../jazz.server";
 import { jazzApp } from "../../../../lib/bench/adapters/jazz-app";
 import {
   DEMO_OWNER_COUNT,
@@ -7,10 +7,11 @@ import {
   DEMO_SEED_BATCH_SIZE,
   clampInt,
   demoRow,
-  normalizeTier,
+  normalizeWriteTier,
   timeoutMs,
   withTimeout,
 } from "../../../../lib/million-rows-demo";
+import { ensureDemoOwnerAccount } from "../../../../lib/million-rows-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
   const ownerCount = clampInt(body.ownerCount, 1, 1, Math.min(10, DEMO_OWNER_COUNT - ownerStart));
   const rowStart = clampInt(body.rowStart, 0, 0, DEMO_ROWS_PER_OWNER - 1);
   const rowCount = clampInt(body.rowCount, DEMO_ROWS_PER_OWNER, 1, DEMO_ROWS_PER_OWNER - rowStart);
-  const tier = normalizeTier(body.tier);
+  const tier = normalizeWriteTier(body.tier);
   const waitTimeoutMs = timeoutMs(body.timeoutMs);
   const startedAt = performance.now();
   let rowsSeeded = 0;
@@ -29,7 +30,8 @@ export async function POST(request: Request) {
 
   try {
     for (let ownerIndex = ownerStart; ownerIndex < ownerStart + ownerCount; ownerIndex += 1) {
-      const db = getJazzContext().asBackend();
+      await ensureDemoOwnerAccount(ownerIndex);
+      const db = jazz.db;
 
       for (let batchStart = rowStart; batchStart < rowStart + rowCount; batchStart += DEMO_SEED_BATCH_SIZE) {
         const batchEnd = Math.min(batchStart + DEMO_SEED_BATCH_SIZE, rowStart + rowCount);
@@ -58,8 +60,6 @@ export async function POST(request: Request) {
         transactions += 1;
       }
     }
-
-    getJazzContext().flush();
 
     return NextResponse.json({
       ownerStart,

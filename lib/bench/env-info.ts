@@ -8,7 +8,8 @@ export function getBenchEnvInfo(provider?: string) {
     jazz: {
       appId: process.env.JAZZ_APP_ID ?? "db-bench",
       serverUrl: process.env.JAZZ_SERVER_URL ?? null,
-      driver: process.env.VERCEL ? "memory" : (process.env.JAZZ_DRIVER ?? "persistent"),
+      driver: "remote",
+      clientEndpoint: "/jazz",
       packageVersion: jazzPackage.version,
     },
     postgres: {

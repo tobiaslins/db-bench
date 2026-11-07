@@ -8,6 +8,16 @@
       "regions": [
         "fra1"
       ]
+    },
+    "app/jazz/[...path]/route.ts": {
+      "regions": [
+        "fra1"
+      ]
+    },
+    "app/api/million-rows/*/route.ts": {
+      "regions": [
+        "fra1"
+      ]
     }
   }
 }
