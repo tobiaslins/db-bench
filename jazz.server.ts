@@ -1,6 +1,6 @@
 import "server-only";
 
-import { acceptLocalFirstAuth, createJazz, remote } from "jazz-tools/backend";
+import { acceptDeviceAccounts, createJazz, remote } from "jazz-tools/backend";
 import { DEMO_USER_HEADER } from "./lib/million-rows-demo";
 import permissions from "./permissions";
 import { app } from "./schema";
@@ -24,6 +24,13 @@ export const jazz = createJazz({
   authenticate(request) {
     const demoUser = request.headers.get(DEMO_USER_HEADER);
 
-    return demoUser ? { userId: demoUser, claims: { benchmarkDemo: true } } : acceptLocalFirstAuth(request);
+    if (!demoUser) return acceptDeviceAccounts(request);
+
+    // Demo users come from a header, not a session, so there's nothing that expires; re-auth hourly.
+    return {
+      userId: demoUser,
+      claims: { benchmarkDemo: true },
+      expiresAt: Math.floor(Date.now() / 1000) + 60 * 60,
+    };
   },
 });

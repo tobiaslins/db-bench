@@ -127,11 +127,13 @@ export function JazzClientRows({ scope }: JazzClientRowsProps) {
 
   return (
     <JazzProvider
-      client={() => import("jazz-tools/local-first")}
-      initial="local-first"
+      config={{
+        client: () => import("jazz-tools/local-first"),
+        initial: "device",
+        scope,
+        serverUrl: "/jazz",
+      }}
       loading={<main className="shell">Loading Jazz...</main>}
-      scope={scope}
-      serverUrl="/jazz"
     >
       <RowsView scope={scope} initialRunId="" />
     </JazzProvider>
