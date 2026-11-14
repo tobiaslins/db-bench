@@ -63,8 +63,8 @@ export async function runBench(adapter: BenchAdapter, request: BenchRequest) {
   }
 
   if (operation === "suite") {
-    const createOne = await timed(() => adapter.createItems(1, options));
     const create1k = await timed(() => adapter.createItems(1000, options));
+    const createOne = await timed(() => adapter.createItems(1, options));
     const select10 = await timed(() => adapter.select10(options));
     const selectTopN = await timed(() => adapter.selectTopN(n, options));
     const id = create1k.result.firstId;
