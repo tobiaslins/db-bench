@@ -29,5 +29,11 @@
         "fra1"
       ]
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/monitor/run",
+      "schedule": "*/15 * * * *"
+    }
+  ]
 }

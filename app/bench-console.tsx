@@ -223,6 +223,9 @@ export function BenchConsole() {
           <a className="textLink" href="/million-rows">
             Million Rows
           </a>
+          <a className="textLink" href="/monitor">
+            Monitor
+          </a>
           <div className={`status status-${status}`}>{status}</div>
         </div>
       </header>

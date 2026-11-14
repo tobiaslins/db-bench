@@ -312,6 +312,35 @@ select {
   text-transform: uppercase;
 }
 
+.errorCell {
+  color: #a3302a;
+  font-weight: 800;
+}
+
+.monitorWindows {
+  grid-template-columns: repeat(4, 1fr);
+  min-width: 220px;
+}
+
+.segmented a {
+  border-radius: 6px;
+  color: inherit;
+  padding: 6px 10px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.monitorHeading {
+  font-size: 15px;
+  margin: 0;
+  padding: 14px 18px 0;
+}
+
+.monitorEmpty {
+  margin: 0;
+  padding: 18px;
+}
+
 .winnerCell {
   background: #ddf5e4;
   color: #145f46;

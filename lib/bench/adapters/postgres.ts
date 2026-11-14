@@ -27,7 +27,7 @@ function shouldUseSsl(databaseUrl: string) {
   return !databaseUrl.includes("localhost") && !databaseUrl.includes("127.0.0.1");
 }
 
-function getPool() {
+export function getPool() {
   if (!pool) {
     const connectionString = getDatabaseUrl();
 
