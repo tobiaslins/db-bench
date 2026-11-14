@@ -46,7 +46,7 @@ export default async function MonitorPage({ searchParams }: { searchParams: Prom
       <header className="topbar">
         <div>
           <h1>Monitor</h1>
-          <p>Scheduled benchmark suite every 15 minutes · latency percentiles in ms over the last {monitorWindows[window]}</p>
+          <p>Benchmark suite every 15 minutes, plus every run from the console · latency percentiles in ms over the last {monitorWindows[window]}</p>
         </div>
         <div className="topActions">
           <a className="textLink" href="/">
@@ -69,7 +69,8 @@ export default async function MonitorPage({ searchParams }: { searchParams: Prom
               <tr>
                 <th>Target</th>
                 <th>Region</th>
-                <th>Runs</th>
+                <th>Cron runs</th>
+                <th>Manual runs</th>
                 <th>Errors</th>
                 <th>Last run</th>
               </tr>
@@ -83,7 +84,8 @@ export default async function MonitorPage({ searchParams }: { searchParams: Prom
                   <tr key={`${provider}-${tier}`}>
                     <td>{targetLabel(provider, tier)}</td>
                     <td className="monoCell">{region}</td>
-                    <td>{summary?.runs ?? 0}</td>
+                    <td>{summary?.cronRuns ?? 0}</td>
+                    <td>{summary?.manualRuns ?? 0}</td>
                     <td className={summary?.errors ? "errorCell" : ""} title={summary?.lastError ?? undefined}>
                       {summary?.errors ?? 0}
                     </td>
@@ -98,7 +100,7 @@ export default async function MonitorPage({ searchParams }: { searchParams: Prom
 
       {rows.length === 0 ? (
         <section className="panel compareWrap">
-          <p className="hintText monitorEmpty">No samples in this window yet. The cron runs every 15 minutes.</p>
+          <p className="hintText monitorEmpty">No samples in this window yet. The cron runs every 15 minutes, and runs from the console count too.</p>
         </section>
       ) : (
         operations.map((operation) => {

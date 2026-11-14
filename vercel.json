@@ -28,6 +28,11 @@
       "regions": [
         "fra1"
       ]
+    },
+    "app/api/bench/postgres/route.ts": {
+      "regions": [
+        "iad1"
+      ]
     }
   },
   "crons": [
