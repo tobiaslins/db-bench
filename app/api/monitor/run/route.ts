@@ -13,7 +13,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const result = await runMonitor(new URL(request.url).origin);
+  // Vercel Cron calls the deployment's own URL, which Deployment Protection guards; the production domain is public.
+  const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const result = await runMonitor(productionHost ? `https://${productionHost}` : new URL(request.url).origin);
 
   return NextResponse.json(result);
 }

@@ -170,8 +170,10 @@ async function runTarget(origin: string, runId: string, target: MonitorTarget): 
     });
     const body = (await response.json().catch(() => null)) as SuiteResponse | null;
 
-    if (!body) {
-      return [{ ...base, operation: "suite", ms: null, region: null, jazzVersion: null, error: `HTTP ${response.status}` }];
+    // Only the bench handler answers with `env`; anything else (a platform 401, a crash page) never got to record itself.
+    if (!body?.env) {
+      const detail = body && typeof body === "object" && "message" in body ? `: ${String(body.message)}` : "";
+      return [{ ...base, operation: "suite", ms: null, region: null, jazzVersion: null, error: `HTTP ${response.status}${detail}` }];
     }
 
     const region = body.env?.region ?? null;
