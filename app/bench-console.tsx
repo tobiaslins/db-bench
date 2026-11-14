@@ -23,7 +23,8 @@ type CompareResult = {
   rows: CompareRow[];
 };
 
-const providers: BenchProvider[] = ["jazz", "postgres", "turso"];
+const providers: BenchProvider[] = ["jazz", "jazz-vercel", "postgres", "turso"];
+const jazzProviders: BenchProvider[] = ["jazz", "jazz-vercel"];
 const operations: BenchOperation[] = ["suite", "createOne", "create", "select10", "selectTopN", "getById", "updateTopN", "updateById"];
 const jazzDurabilityTiers: JazzDurabilityTier[] = ["global", "local"];
 
@@ -157,7 +158,7 @@ export function BenchConsole() {
       n: overrides.n ?? n,
       id: id || undefined,
       runId: runId || undefined,
-      jazzDurabilityTier: provider === "jazz" ? jazzDurabilityTier : undefined,
+      jazzDurabilityTier: jazzProviders.includes(provider) ? jazzDurabilityTier : undefined,
     };
 
     const result = (await fetch(`/api/bench/${provider}`, {
@@ -181,7 +182,7 @@ export function BenchConsole() {
       count: 1000,
       n,
       runId: nextRunId,
-      jazzDurabilityTier: nextProvider === "jazz" ? jazzDurabilityTier : undefined,
+      jazzDurabilityTier: jazzProviders.includes(nextProvider) ? jazzDurabilityTier : undefined,
     };
 
     return (await fetch(`/api/bench/${nextProvider}`, {
@@ -261,7 +262,7 @@ export function BenchConsole() {
             </select>
           </label>
 
-          {provider === "jazz" ? (
+          {jazzProviders.includes(provider) ? (
             <>
               <fieldset>
                 <legend>Jazz Durability</legend>

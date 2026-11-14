@@ -12,6 +12,7 @@
   "dependencies": {
     "@tursodatabase/serverless": "1.2.0-pre.2",
     "@vercel/functions": "^3.11.0",
+    "@vercel/sandbox": "^4.0.0",
     "jazz-napi": "2.0.0-alpha.62",
     "jazz-tools": "2.0.0-alpha.62",
     "jazz-wasm": "2.0.0-alpha.62",

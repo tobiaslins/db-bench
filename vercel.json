@@ -9,6 +9,11 @@
         "fra1"
       ]
     },
+    "app/api/bench/jazz-vercel/route.ts": {
+      "regions": [
+        "fra1"
+      ]
+    },
     "app/jazz/[...path]/route.ts": {
       "regions": [
         "fra1"
