@@ -14,6 +14,11 @@
         "fra1"
       ]
     },
+    "app/api/bench/turso/route.ts": {
+      "regions": [
+        "dub1"
+      ]
+    },
     "app/jazz/[...path]/route.ts": {
       "regions": [
         "fra1"
