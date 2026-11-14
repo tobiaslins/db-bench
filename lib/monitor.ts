@@ -29,6 +29,21 @@ export const monitorWindows = {
 
 export type MonitorWindow = keyof typeof monitorWindows;
 
+export const monitorWindowMinutes: Record<MonitorWindow, number> = {
+  "1h": 60,
+  "24h": 24 * 60,
+  "7d": 7 * 24 * 60,
+  "30d": 30 * 24 * 60,
+};
+
+// Chart bucket per window: small enough to show change, big enough that each bucket holds a few runs.
+export const seriesBucketMinutes: Record<MonitorWindow, number> = {
+  "1h": 5,
+  "24h": 30,
+  "7d": 3 * 60,
+  "30d": 12 * 60,
+};
+
 const tableName = "bench_monitor_samples";
 
 let schemaReady: Promise<void> | undefined;
@@ -278,4 +293,40 @@ export async function getMonitorStats(window: MonitorWindow) {
   }));
 
   return { rows, targets };
+}
+
+export type SeriesPoint = {
+  provider: string;
+  tier: string;
+  operation: string;
+  bucket: string;
+  count: number;
+  p50: number;
+  p95: number;
+  p99: number;
+};
+
+export async function getMonitorSeries(window: MonitorWindow): Promise<SeriesPoint[]> {
+  await ensureSchema();
+
+  const result = await getPool().query(
+    `SELECT provider, tier, operation, date_bin($2::interval, run_at, TIMESTAMPTZ '2026-01-01') AS bucket, count(*)::int AS count,
+       percentile_cont(ARRAY[0.5, 0.95, 0.99]) WITHIN GROUP (ORDER BY ms) AS p
+     FROM ${tableName}
+     WHERE run_at > now() - $1::interval AND ms IS NOT NULL
+     GROUP BY provider, tier, operation, bucket
+     ORDER BY bucket`,
+    [monitorWindows[window], `${seriesBucketMinutes[window]} minutes`],
+  );
+
+  return result.rows.map((row) => ({
+    provider: row.provider,
+    tier: row.tier,
+    operation: row.operation,
+    bucket: (row.bucket as Date).toISOString(),
+    count: row.count,
+    p50: row.p[0],
+    p95: row.p[1],
+    p99: row.p[2],
+  }));
 }

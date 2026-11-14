@@ -387,3 +387,143 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+
+.viz-root {
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --chart-surface: #ffffff;
+  --chart-grid: #ebe8df;
+  --chart-ink-muted: #6a6862;
+}
+
+.chartHeader {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 14px 18px 0;
+}
+
+.chartHeader .monitorHeading {
+  padding: 0;
+}
+
+.chartControls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chartControls select {
+  min-height: 34px;
+  padding: 4px 8px;
+  width: auto;
+}
+
+.chartControls .segmented {
+  min-width: 180px;
+}
+
+.chartLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 10px 18px 0;
+}
+
+.legendItem {
+  align-items: center;
+  background: none;
+  border: none;
+  color: #202124;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 4px;
+}
+
+.legendItem.off {
+  color: var(--chart-ink-muted);
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.chartWrap {
+  padding: 4px 0 8px;
+  position: relative;
+}
+
+.chartWrap svg {
+  display: block;
+}
+
+.gridLine {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  fill: var(--chart-ink-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.crosshair {
+  stroke: #9a978d;
+  stroke-dasharray: 3 3;
+  stroke-width: 1;
+}
+
+.pointRing {
+  stroke: var(--chart-surface);
+  stroke-width: 2;
+}
+
+.chartEmpty {
+  color: var(--chart-ink-muted);
+  left: 0;
+  margin: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 45%;
+}
+
+.chartTooltip {
+  background: #ffffff;
+  border: 1px solid #dedbd2;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(42, 39, 31, 0.12);
+  display: grid;
+  font-size: 12px;
+  gap: 4px;
+  min-width: 240px;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  top: 20px;
+}
+
+.tooltipRow {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 18px 1fr auto;
+}
+
+.tooltipValue {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.tooltipValue em {
+  color: var(--chart-ink-muted);
+  font-style: normal;
+  font-weight: 400;
+}

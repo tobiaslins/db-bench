@@ -1,4 +1,15 @@
-import { getMonitorStats, monitorOperations, monitorTargets, monitorWindows, type MonitorWindow, type PercentileRow } from "../../lib/monitor";
+import {
+  getMonitorSeries,
+  getMonitorStats,
+  monitorOperations,
+  monitorTargets,
+  monitorWindowMinutes,
+  monitorWindows,
+  seriesBucketMinutes,
+  type MonitorWindow,
+  type PercentileRow,
+} from "../../lib/monitor";
+import { LatencyChart } from "./latency-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +46,10 @@ function formatAgo(date: Date | null) {
 export default async function MonitorPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const requested = (await searchParams).window;
   const window: MonitorWindow = typeof requested === "string" && requested in monitorWindows ? (requested as MonitorWindow) : "24h";
-  const { rows, targets } = await getMonitorStats(window);
+  const [{ rows, targets }, series] = await Promise.all([getMonitorStats(window), getMonitorSeries(window)]);
+  const end = new Date();
+  const start = new Date(end.getTime() - monitorWindowMinutes[window] * 60_000);
+  const chartTargets = monitorTargets.map(({ provider, tier = "-" }) => ({ provider, tier }));
 
   const rowFor = (operation: string, provider: string, tier: string): PercentileRow | undefined =>
     rows.find((row) => row.operation === operation && row.provider === provider && row.tier === tier);
@@ -97,6 +111,15 @@ export default async function MonitorPage({ searchParams }: { searchParams: Prom
           </table>
         </div>
       </section>
+
+      <LatencyChart
+        bucketMinutes={seriesBucketMinutes[window]}
+        end={end.toISOString()}
+        operations={operations.map((operation) => ({ id: operation, label: operationLabels[operation] }))}
+        points={series}
+        start={start.toISOString()}
+        targets={chartTargets}
+      />
 
       {rows.length === 0 ? (
         <section className="panel compareWrap">
