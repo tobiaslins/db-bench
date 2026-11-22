@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { schema as s, userIdentity } from "jazz-tools";
-import { createJazzContext } from "../node_modules/jazz-tools/dist/backend/create-jazz-context.js";
+import { userIdentity } from "jazz-tools";
+import { createJazz, remote } from "jazz-tools/backend";
+import { app } from "../jazz.generated.ts";
+import permissions from "../jazz.permissions.json" with { type: "json" };
 
 function loadEnvFile(path, { override = false } = {}) {
   if (!existsSync(path)) return;
@@ -40,78 +42,43 @@ function withTimeout(promise, ms, label) {
 loadEnvFile(".env");
 loadEnvFile(".env.local", { override: true });
 
-const appSchema = {
-  benchItems: s
-    .table({
-      runId: s.string(),
-      ordinal: s.int(),
-      value: s.string(),
-      createdAt: s.int(),
-    })
-    .indexOnly(["runId", "ordinal"]),
-  demoRows: s
-    .table({
-      ownerId: s.string(),
-      ownerIssuer: s.string(),
-      ownerSubject: s.string(),
-      ownerIndex: s.int(),
-      ordinal: s.int(),
-      payload: s.string(),
-      createdAt: s.int(),
-    })
-    .indexOnly(["ownerId", "createdAt"]),
-};
-const app = s.defineApp(appSchema);
-const permissions = s.definePermissions(app, ({ policy, session }) => [
-  policy.benchItems.allowRead.always(),
-  policy.benchItems.allowInsert.always(),
-  policy.benchItems.allowUpdate.always(),
-  policy.benchItems.allowDelete.always(),
-  policy.demoRows.allowRead.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowInsert.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowUpdate
-    .whereOld({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject })
-    .whereNew({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowDelete.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-]);
-
-const ownerSession = {
-  issuer: "db-bench-repro",
-  user_id: "owner-0",
-  claims: {},
-  authMode: "external",
-};
-const ownerId = userIdentity(ownerSession.issuer, ownerSession.user_id);
-const backendSecret = process.env.JAZZ_BACKEND_SECRET || process.env.BACKEND_SECRET;
+const ownerIssuer = "db-bench-repro";
+const ownerSubject = "owner-0";
+const ownerId = userIdentity(ownerIssuer, ownerSubject);
 const serverUrl = process.env.JAZZ_SERVER_URL;
-
-if (!backendSecret) throw new Error("Missing JAZZ_BACKEND_SECRET or BACKEND_SECRET");
+const adminSecret = process.env.JAZZ_ADMIN_SECRET;
 if (!serverUrl) throw new Error("Missing JAZZ_SERVER_URL");
+if (!adminSecret) throw new Error("Missing JAZZ_ADMIN_SECRET");
 
-console.log({ packageVersion: JSON.parse(readFileSync("node_modules/jazz-tools/package.json", "utf8")).version, serverUrl });
-
-const context = createJazzContext({
-  appId: process.env.JAZZ_APP_ID ?? "db-bench",
+const jazz = createJazz({
   app,
   permissions,
-  driver: { type: "memory" },
-  serverUrl,
-  backendSecret,
-  adminSecret: process.env.JAZZ_ADMIN_SECRET,
+  store: remote({
+    appId: process.env.JAZZ_APP_ID ?? "db-bench",
+    url: serverUrl,
+    secret: adminSecret,
+  }),
+  authenticate: () => ({
+    userId: ownerSubject,
+    expiresAt: Math.floor(Date.now() / 1000) + 3600,
+  }),
 });
 
-const db = context.forSession(ownerSession);
 const id = randomUUID();
 const started = Date.now();
 
 try {
+  await jazz.createAccountFor(ownerSubject);
+  const db = await jazz.forReqUser(new Request(serverUrl));
+
+  console.log({ packageVersion: JSON.parse(readFileSync("node_modules/jazz-tools/package.json", "utf8")).version, serverUrl });
   console.log("insert local wait...");
   const localWrite = db.insert(
     app.demoRows,
     {
       ownerId,
-      ownerIssuer: ownerSession.issuer,
-      ownerSubject: ownerSession.user_id,
+      ownerIssuer,
+      ownerSubject,
       ownerIndex: 0,
       ordinal: started % 1_000_000,
       payload: `repro-${started}`,
@@ -122,7 +89,7 @@ try {
   await withTimeout(localWrite.wait({ tier: "local" }), 5_000, "local write");
   console.log("local write ok");
 
-  for (const tier of ["local", "edge", "global"]) {
+  for (const tier of ["local-first", "remote"]) {
     const readStart = performance.now();
     try {
       const rows = await withTimeout(
@@ -138,24 +105,24 @@ try {
     }
   }
 
-  console.log("insert edge wait...");
-  const edgeWrite = db.insert(
+  console.log("insert global wait...");
+  const globalWrite = db.insert(
     app.demoRows,
     {
       ownerId,
-      ownerIssuer: ownerSession.issuer,
-      ownerSubject: ownerSession.user_id,
+      ownerIssuer,
+      ownerSubject,
       ownerIndex: 0,
       ordinal: (started % 1_000_000) + 1,
-      payload: `repro-edge-${started}`,
+      payload: `repro-global-${started}`,
       createdAt: Math.floor(started / 1000) + 1,
     },
     { id: randomUUID() },
   );
-  await withTimeout(edgeWrite.wait({ tier: "edge" }), 5_000, "edge write");
-  console.log("edge write ok");
+  await withTimeout(globalWrite.wait({ tier: "global" }), 5_000, "global write");
+  console.log("global write ok");
 
-  for (const tier of ["local", "edge", "global"]) {
+  for (const tier of ["local-first", "remote"]) {
     const readStart = performance.now();
     try {
       const rows = await withTimeout(
@@ -163,20 +130,20 @@ try {
           tier,
         }),
         5_000,
-        `${tier} read after edge write`,
+        `${tier} read after global write`,
       );
-      console.log(`${tier} read after edge write ok`, {
+      console.log(`${tier} read after global write ok`, {
         ms: Number((performance.now() - readStart).toFixed(3)),
         rows: rows.length,
         firstPayload: rows[0]?.payload,
       });
     } catch (error) {
-      console.log(`${tier} read after edge write failed`, {
+      console.log(`${tier} read after global write failed`, {
         ms: Number((performance.now() - readStart).toFixed(3)),
         error: error.message,
       });
     }
   }
 } finally {
-  await context.shutdown();
+  await jazz.close();
 }

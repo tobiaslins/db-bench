@@ -2,8 +2,8 @@ import "server-only";
 
 import { acceptDeviceAccounts, createJazz, remote } from "jazz-tools/backend";
 import { DEMO_USER_HEADER } from "./lib/million-rows-demo";
-import permissions from "./permissions";
-import { app } from "./schema";
+import { app } from "./jazz.generated";
+import permissions from "./jazz.permissions.json" with { type: "json" };
 
 function requiredEnv(name: "JAZZ_APP_ID" | "JAZZ_SERVER_URL" | "JAZZ_ADMIN_SECRET") {
   const value = process.env[name];

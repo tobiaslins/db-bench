@@ -214,7 +214,7 @@ export function BenchConsole() {
       <header className="topbar">
         <div>
           <h1>DB Bench</h1>
-          <p>Turso and Jazz alpha benchmark runner</p>
+          <p>Turso and Jazz beta benchmark runner</p>
         </div>
         <div className="topActions">
           <a className="textLink" href="/jazz-client">

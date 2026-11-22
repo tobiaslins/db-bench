@@ -12,12 +12,12 @@ pnpm dev
 
 Turso needs `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
 Postgres needs `POSTGRES_URL` or `DATABASE_URL`. Set `POSTGRES_SSL=false` for local databases if needed.
-Jazz uses `jazz-tools@alpha`. Set `JAZZ_SERVER_URL`, `JAZZ_APP_ID`, and `JAZZ_ADMIN_SECRET` to benchmark against Jazz Cloud. Use `JAZZ_DURABILITY_TIER=global` for cloud-confirmed writes and remote reads.
+Jazz uses `jazz-tools@2.0.0-beta.0`. Set `JAZZ_SERVER_URL`, `JAZZ_APP_ID`, and `JAZZ_ADMIN_SECRET` to benchmark against Jazz Cloud. Use `JAZZ_DURABILITY_TIER=global` for cloud-confirmed writes and remote reads.
 
-Validate the Jazz schema and permissions after changing them:
+Regenerate the Jazz bindings and permissions after editing the schema or permissions:
 
 ```bash
-pnpm exec jazz-tools validate
+pnpm exec jazz-tools generate
 ```
 
 The Next.js backend publishes the schema, permissions, and migrations when `createJazz` starts. Browser clients connect through `/jazz`; no separate Jazz development server is needed.

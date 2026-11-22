@@ -1,0 +1,25 @@
+{
+  "$schema": "https://jazz.tools/schemas/jazz.app.v1.json",
+  "$generated": {
+    "by": "jazz-tools generate from schema.ts — edit the TypeScript, not this file",
+    "sha256": "bfa874383cd20efd5250c5b259ec9dcb49970cda3e6dade8f06b8c262b98297c"
+  },
+  "tables": {
+    "benchItems": {
+      "columns": { "runId": "string", "ordinal": "int", "value": "string", "createdAt": "int" },
+      "indexes": ["runId", "ordinal", ["runId", "ordinal"]]
+    },
+    "demoRows": {
+      "columns": {
+        "ownerId": "string",
+        "ownerIssuer": "string",
+        "ownerSubject": "string",
+        "ownerIndex": "int",
+        "ordinal": "int",
+        "payload": "string",
+        "createdAt": "int"
+      },
+      "indexes": ["ownerId", "createdAt"]
+    }
+  }
+}

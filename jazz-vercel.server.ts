@@ -1,8 +1,8 @@
 import "server-only";
 
 import { createJazz, vercel } from "jazz-tools/backend";
-import permissions from "./permissions";
-import { app } from "./schema";
+import { app } from "./jazz.generated";
+import permissions from "./jazz.permissions.json" with { type: "json" };
 
 export const JAZZ_VERCEL_REGION = "fra1";
 

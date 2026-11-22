@@ -1,7 +1,6 @@
 import { schema as s } from "jazz-tools";
-import { migrations } from "./migrations";
 
-export const schema = {
+export const schema = s.defineSchema({
   benchItems: s
     .table({
       runId: s.string(),
@@ -22,8 +21,17 @@ export const schema = {
       createdAt: s.int(),
     }, {})
     .indexOnly(["ownerId", "createdAt"]),
-};
+});
 
-export type JazzBenchSchema = s.Schema<typeof schema>;
+const { definePermissions, session } = schema;
+const ownsDemoRow = { ownerSubject: session.identity.subject };
 
-export const app: s.App<JazzBenchSchema> = s.defineApp(schema, { migrations });
+export const permissions = definePermissions({
+  benchItems: { read: true, insert: true, update: true, delete: true },
+  demoRows: {
+    read: ownsDemoRow,
+    insert: ownsDemoRow,
+    update: ownsDemoRow,
+    delete: ownsDemoRow,
+  },
+});

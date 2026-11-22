@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
-import { schema as s, userIdentity } from "jazz-tools";
-import { createJazzContext } from "../node_modules/jazz-tools/dist/backend/create-jazz-context.js";
+import { userIdentity } from "jazz-tools";
+import { createJazz, remote } from "jazz-tools/backend";
+import { app } from "../jazz.generated.ts";
+import permissions from "../jazz.permissions.json" with { type: "json" };
 
 function loadEnvFile(path, { override = false } = {}) {
   if (!existsSync(path)) return;
@@ -20,62 +22,33 @@ function loadEnvFile(path, { override = false } = {}) {
   }
 }
 
-const appSchema = {
-  benchItems: s
-    .table({
-      runId: s.string(),
-      ordinal: s.int(),
-      value: s.string(),
-      createdAt: s.int(),
-    })
-    .indexOnly(["runId", "ordinal"]),
-  demoRows: s
-    .table({
-      ownerId: s.string(),
-      ownerIssuer: s.string(),
-      ownerSubject: s.string(),
-      ownerIndex: s.int(),
-      ordinal: s.int(),
-      payload: s.string(),
-      createdAt: s.int(),
-    })
-    .indexOnly(["ownerId", "createdAt"]),
-};
-const app = s.defineApp(appSchema);
-const permissions = s.definePermissions(app, ({ policy, session }) => [
-  policy.benchItems.allowRead.always(),
-  policy.benchItems.allowInsert.always(),
-  policy.benchItems.allowUpdate.always(),
-  policy.benchItems.allowDelete.always(),
-  policy.demoRows.allowRead.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowInsert.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowUpdate
-    .whereOld({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject })
-    .whereNew({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-  policy.demoRows.allowDelete.where({ ownerIssuer: session.user.identity.issuer, ownerSubject: session.user.identity.subject }),
-]);
-
 loadEnvFile(".env");
 loadEnvFile(".env.local", { override: true });
 
 const ownerIndex = Number(process.argv[2] ?? 1);
-const tier = process.argv[3] ?? "local";
-const ownerId = userIdentity("db-bench-million-rows", `owner-${String(ownerIndex).padStart(4, "0")}`);
-const context = createJazzContext({
-  appId: process.env.JAZZ_APP_ID ?? "db-bench",
+const requestedTier = process.argv[3] ?? "local-first";
+const tier = { local: "local-first", global: "remote" }[requestedTier] ?? requestedTier;
+const ownerSubject = `owner-${String(ownerIndex).padStart(4, "0")}`;
+const ownerId = userIdentity("db-bench-million-rows", ownerSubject);
+const serverUrl = process.env.JAZZ_SERVER_URL;
+const adminSecret = process.env.JAZZ_ADMIN_SECRET;
+if (!serverUrl) throw new Error("Missing JAZZ_SERVER_URL");
+if (!adminSecret) throw new Error("Missing JAZZ_ADMIN_SECRET");
+
+const jazz = createJazz({
   app,
   permissions,
-  driver: { type: "memory" },
-  serverUrl: process.env.JAZZ_SERVER_URL,
-  backendSecret: process.env.JAZZ_BACKEND_SECRET || process.env.BACKEND_SECRET,
-  adminSecret: process.env.JAZZ_ADMIN_SECRET,
+  store: remote({
+    appId: process.env.JAZZ_APP_ID ?? "db-bench",
+    url: serverUrl,
+    secret: adminSecret,
+  }),
+  authenticate: () => ({
+    userId: ownerSubject,
+    expiresAt: Math.floor(Date.now() / 1000) + 3600,
+  }),
 });
-const db = context.forSession({
-  issuer: "db-bench-million-rows",
-  user_id: `owner-${String(ownerIndex).padStart(4, "0")}`,
-  claims: { demoOwnerIndex: ownerIndex },
-  authMode: "external",
-});
+
 const options = { tier };
 const variants = [
   ["where-limit50", app.demoRows.where({ ownerId }).limit(50)],
@@ -87,6 +60,9 @@ const variants = [
 ];
 
 try {
+  await jazz.createAccountFor(ownerSubject);
+  const db = await jazz.forReqUser(new Request(serverUrl));
+
   console.log({ ownerIndex, tier, serverUrl: process.env.JAZZ_SERVER_URL });
   for (const [name, query] of variants) {
     const started = performance.now();
@@ -94,5 +70,5 @@ try {
     console.log({ name, ms: Number((performance.now() - started).toFixed(3)), rows: rows.length });
   }
 } finally {
-  await context.shutdown();
+  await jazz.close();
 }
